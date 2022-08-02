@@ -48,7 +48,7 @@ def emulate_lowrez_scene args, sprites, labels, mouse
     l.text.each_char.each_with_index.map do |char, i|
       [CENTER_OFFSET + EMULATED_FONT_X_ZERO + (as_label.x * TINY_SCALE) + i * 5 * TINY_SCALE,
        EMULATED_FONT_Y_ZERO + (as_label.y * TINY_SCALE), char,
-       EMULATED_FONT_SIZE, 0, as_label.r, as_label.g, as_label.b, as_label.a, 'dragonruby-gtk-4x4.ttf']
+       EMULATED_FONT_SIZE, 0, as_label.r, as_label.g, as_label.b, as_label.a, 'assets/fonts/dragonruby-gtk-4x4.ttf']
     end
   end
 

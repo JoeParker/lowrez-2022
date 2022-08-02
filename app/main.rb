@@ -18,6 +18,8 @@ end
 
 def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
   # args.state.show_gridlines = true
+  lowrez_labels << [0, 0, "#{args.state.tick_count}", 255, 0, 0]
+  
   render_game args, lowrez_sprites
   move_blue_ship args
 end
