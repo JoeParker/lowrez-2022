@@ -1,9 +1,9 @@
-require 'app/lowrez_emulator.rb'
-require 'app/renderer.rb'
+###################################################################################
+# APPLICATION ENTRY POINT
+###################################################################################
 
-###################################################################################
-# ENTRY POINT
-###################################################################################
+require 'app/engine/game_loop.rb'
+require 'app/engine/lowrez_emulator.rb'
 
 def tick args
   sprites = []
@@ -14,12 +14,4 @@ def tick args
   render_gridlines_if_needed args
   render_mouse_crosshairs args, mouse
   emulate_lowrez_scene args, sprites, labels, mouse
-end
-
-def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
-  # args.state.show_gridlines = true
-  lowrez_labels << [0, 0, "#{args.state.tick_count}", 255, 0, 0]
-  
-  render_game args, lowrez_sprites
-  move_blue_ship args
 end
