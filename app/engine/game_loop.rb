@@ -27,5 +27,5 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     # Enemy physics
     spawn_enemies args
     move_enemies args
-    # kill_enemies args
+    kill_enemies args
   end
