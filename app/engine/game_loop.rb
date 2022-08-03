@@ -19,6 +19,4 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     
     render_game args, lowrez_sprites
     move_player args
-    
-    move_blue_ship args
   end
