@@ -1,6 +1,9 @@
 PLAYER_WIDTH = 6
 MOVE_SPEED = 0.1
 
+PLAYER_PROJECTILE_SPEED = 0.08
+ENEMY_PROJECTILE_SPEED = 0.08
+
 def render_game args, lowrez_sprites
   args.state.background ||= {
     x: 0, y: 0,
@@ -14,7 +17,7 @@ def render_game args, lowrez_sprites
     w: PLAYER_WIDTH, h: PLAYER_WIDTH, 
     vx: 0, vy: 0, 
     direction: 1,
-    started_moving_at: 0,#nil,
+    started_moving_at: 0,#nil, # This would be set to nil initially if we wanted the sprite to start idle
     health: 10, 
     cooldown: 0, 
     score: 0
@@ -22,8 +25,10 @@ def render_game args, lowrez_sprites
   args.state.player[:r] = args.state.player[:g] = args.state.player[:b] = (args.state.player[:health] * 25.5).clamp(0, 255)
 
   args.state.player_bullets ||= []
-
   lowrez_sprites << [args.state.player_bullets]
+
+  args.state.enemies ||= []
+  lowrez_sprites << [args.state.enemies]
 
   # if args.state.player.started_moving_at
     lowrez_sprites << [running_sprite(args)]
@@ -31,6 +36,34 @@ def render_game args, lowrez_sprites
     # lowrez_sprites << [idle_sprite(args)]
   # end
 
+end
+
+def spawn_enemies args
+  # Spawn enemies more frequently as the player's score increases.
+  if rand < (100+args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
+    theta = rand * Math::PI * 2
+    args.state.enemies << {
+        x: 32 + Math.cos(theta) * 8, y: 32 + Math.sin(theta) * 8, # TODO calculate random starting point somewhere closely outside the screen bounds
+        w: 2, h: 3, 
+        path: 'assets/sprites/enemy-missile.png',
+        angle: 0
+    }
+  end
+end
+
+def move_enemies args
+  args.state.enemies.each do |enemy|
+    # Get the angle from the enemy to the player
+    theta = Math.atan2(enemy.y - args.state.player.y, enemy.x - args.state.player.x)
+    # Convert the angle to a vector pointing at the player
+    dx, dy = theta.to_degrees.vector 5
+    # Move the enemy towards the player
+    enemy.x -= dx * ENEMY_PROJECTILE_SPEED
+    enemy.y -= dy * ENEMY_PROJECTILE_SPEED
+
+    # Adjust the angle that the missile sprite should aim at the player
+    enemy.angle = theta.to_degrees + 90
+  end
 end
 
 def move_bullets args
@@ -41,7 +74,7 @@ def move_bullets args
   end
   args.state.player_bullets.reject! do |bullet|
     # Despawn bullets that are outside the screen area
-    bullet.x < -0 || bullet.y < -0 || bullet.x > 70 || bullet.y > 70
+    bullet.x < 0 || bullet.y < 0 || bullet.x > 70 || bullet.y > 70
   end
 end
 
@@ -76,8 +109,8 @@ def shoot_directional_vector args
   # dy += 0.1 if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_held.up
   # dy -= 0.1 if args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_held.down
 
-  dx += 0.1 if args.inputs.keyboard.key_down.space && args.state.player.direction < 0
-  dx -= 0.1 if args.inputs.keyboard.key_down.space && args.state.player.direction > 0
+  dx += PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction < 0
+  dx -= PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction > 0
 
   if dx != 0 && dy != 0
     dx *= 0.7071

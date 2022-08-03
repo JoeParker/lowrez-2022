@@ -18,7 +18,14 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     }
     
     render_game args, lowrez_sprites
+
+    # Player physics
     move_player args
     move_bullets args
     fire_player args
+
+    # Enemy physics
+    spawn_enemies args
+    move_enemies args
+    # kill_enemies args
   end
