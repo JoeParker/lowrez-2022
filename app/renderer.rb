@@ -1,10 +1,54 @@
-PLAYER_WIDTH = 6
-MOVE_SPEED = 0.1
+###################################################################################
+# MANAGES UI AND SPRITE ANIMATIONS FOR ENTITIES ON THE SCREEN
+###################################################################################
 
-PLAYER_PROJECTILE_SPEED = 0.10
-ENEMY_PROJECTILE_SPEED = 0.06
+PLAYER_WIDTH = 6
+
+# Debug settings:
+DISPLAY_GRID = false # Display 64x64 grid overlay
+DISPLAY_TICKS = false # Display frame counter
+
+def initialise_player args
+  if args.state.player == nil || !args.state.player.health.is_a?(Numeric) # If there's an issue on game reset, reinitialise the player state
+    args.state.player = {
+        x: 28, y: 28, 
+        w: PLAYER_WIDTH, h: PLAYER_WIDTH, 
+        vx: 0, vy: 0, 
+        direction: 1,
+        path: "assets/sprites/enemy-fly.png",
+        started_moving_at: 0, # This would be set to nil initially if we wanted the sprite to start idle
+        health: 10, 
+        cooldown: 0, 
+        score: 0
+      }
+  end
+end
+
+def render_ui args, lowrez_labels
+  if DISPLAY_TICKS
+    lowrez_labels << {
+      x: 0,
+      y: 0,
+      text: "#{args.state.tick_count}",
+      r: 255,
+      g: 0,
+      b: 0
+  }
+  end
+
+  lowrez_labels << {
+    x: 1,
+    y: 59,
+    text: "#{args.state.player.score}",
+    r: 0,
+    g: 255,
+    b: 0
+  }
+end
 
 def render_game args, lowrez_sprites
+  args.state.show_gridlines = DISPLAY_GRID
+
   args.state.background ||= {
     x: 0, y: 0,
     w: 64, h: 64,
@@ -12,17 +56,10 @@ def render_game args, lowrez_sprites
   }
   lowrez_sprites << [args.state.background]
 
-  args.state.player ||= {
-    x: 28, y: 28, 
-    w: PLAYER_WIDTH, h: PLAYER_WIDTH, 
-    vx: 0, vy: 0, 
-    direction: 1,
-    started_moving_at: 0,#nil, # This would be set to nil initially if we wanted the sprite to start idle
-    health: 10, 
-    cooldown: 0, 
-    score: 0
-  }
-  args.state.player[:r] = args.state.player[:g] = args.state.player[:b] = (args.state.player[:health] * 25.5).clamp(0, 255)
+  args.state.healthbar ||= []
+  lowrez_sprites << [args.state.healthbar]
+
+  draw_health args
 
   args.state.player_bullets ||= []
   lowrez_sprites << [args.state.player_bullets]
@@ -38,25 +75,13 @@ def render_game args, lowrez_sprites
 
 end
 
-def kill_enemies args 
-  args.state.enemies.reject! do |enemy|
-    # Check if enemy and player are within 3 pixels of each other (i.e. overlapping)
-    if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
-      # Enemy is touching player. Kill enemy, and reduce player HP by 1.
-      args.state.player[:health] -= 1
-    else
-      args.state.player_bullets.any? do |bullet|
-        # Check if enemy and bullet are within 2 pixels of each other (i.e. overlapping)
-        if 4 > (enemy.x - bullet.x) ** 2 + (enemy.y - bullet.y) ** 2
-          # Increase player health by one for each enemy killed by a bullet after the first enemy, up to a maximum of 10 HP
-          args.state.player[:health] += 1 if args.state.player[:health] < 10 && bullet[:kills] > 0
-          # Keep track of how many enemies have been killed by this particular bullet
-          bullet[:kills] += 1
-          # Earn more points by killing multiple enemies with one shot.
-          args.state.player[:score]  += bullet[:kills]
-        end
-      end
-    end
+def draw_health args
+  args.state.player.health.clamp(0, 10).times do |index|
+    args.state.healthbar << {
+      x: 62 - index * 2, y: 62,
+      w: 1, h: 1,
+      r: 255, g: 0, b: 0
+    }
   end
 end
 
@@ -73,7 +98,7 @@ end
 
 def spawn_enemies args
   # Spawn enemies more frequently as the player's score increases.
-  if rand < (100+args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
+  if rand < (75+args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
     x, y = calculate_spawn_point
     args.state.enemies << {
       x: x, y: y,
@@ -81,33 +106,6 @@ def spawn_enemies args
       path: 'assets/sprites/enemy-missile.png',
       angle: 0
     }
-  end
-end
-
-def move_enemies args
-  args.state.enemies.each do |enemy|
-    # Get the angle from the enemy to the player
-    theta = Math.atan2(enemy.y - args.state.player.y, enemy.x - args.state.player.x)
-    # Convert the angle to a vector pointing at the player
-    dx, dy = theta.to_degrees.vector 5
-    # Move the enemy towards the player
-    enemy.x -= dx * ENEMY_PROJECTILE_SPEED
-    enemy.y -= dy * ENEMY_PROJECTILE_SPEED
-
-    # Adjust the angle that the missile sprite should aim at the player
-    enemy.angle = theta.to_degrees + 90
-  end
-end
-
-def move_bullets args
-  args.state.player_bullets.each do |bullet|
-    # Move the bullets according to the bullet's velocity
-    bullet.x += bullet[:vx]
-    bullet.y += bullet[:vy]
-  end
-  args.state.player_bullets.reject! do |bullet|
-    # Despawn bullets that are outside the screen area
-    bullet.x < 0 || bullet.y < 0 || bullet.x > 70 || bullet.y > 70
   end
 end
 
@@ -131,25 +129,6 @@ def fire_player args
     }
     args.state.player[:cooldown] = 30 # Reset the cooldown
   end
-end
-
-# Custom function for getting a directional vector just for shooting using the arrow keys
-def shoot_directional_vector args
-  dx = 0
-  # dx += 0.1 if args.inputs.keyboard.key_down.right || args.inputs.keyboard.key_held.right
-  # dx -= 0.1 if args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_held.left
-  dy = 0
-  # dy += 0.1 if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_held.up
-  # dy -= 0.1 if args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_held.down
-
-  dx += PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction < 0
-  dx -= PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction > 0
-
-  if dx != 0 && dy != 0
-    dx *= 0.7071
-    dy *= 0.7071
-  end
-  [dx, dy]
 end
 
 def idle_sprite args
@@ -190,57 +169,4 @@ def running_sprite args
     tile_h: args.state.player.h,
     flip_horizontally: args.state.player.direction > 0,
   }
-end
-
-def move_player args
-  # Get the currently held direction.
-  dx, dy = move_directional_vector args
-  # Take the weighted average of the old velocities and the desired velocities. 
-  # Since move_directional_vector returns values between -1 and 1, 
-  #   and we want to limit the speed to 7.5, we multiply dx and dy by 7.5*0.1 to get 0.75
-  args.state.player[:vx] = args.state.player[:vx] * 0.9 + dx * 0.75
-  args.state.player[:vy] = args.state.player[:vy] * 0.9 + dy * 0.75
-  # Move the player
-  args.state.player.x += args.state.player[:vx]
-  args.state.player.y += args.state.player[:vy]
-  # If the player is about to go out of bounds, put them back in bounds.
-  args.state.player.x = args.state.player.x.clamp(0, 64 - PLAYER_WIDTH)
-  args.state.player.y = args.state.player.y.clamp(0, 64 - PLAYER_WIDTH)
-end
-
-# Custom function for getting a directional vector just for movement using WASD
-def move_directional_vector args
-  dx = 0
-  if args.inputs.keyboard.d
-    dx += MOVE_SPEED 
-    args.state.player.direction = -1
-    args.state.player.started_moving_at ||= args.state.tick_count
-  end
-  if args.inputs.keyboard.a
-    dx -= MOVE_SPEED 
-    args.state.player.direction = 1
-    args.state.player.started_moving_at ||= args.state.tick_count
-  end
-  dy = 0
-  if args.inputs.keyboard.w
-    dy += MOVE_SPEED 
-    args.state.player.started_moving_at ||= args.state.tick_count
-  end
-  if args.inputs.keyboard.s
-    dy -= MOVE_SPEED 
-    args.state.player.started_moving_at ||= args.state.tick_count
-  end
-
-  # Stop the sprite animation when stationary:
-  # e.g. for flying animations we don't want this
-  #
-  # if !args.inputs.keyboard.directional_vector
-  #   args.state.player.started_moving_at = nil
-  # end
-
-  if dx != 0 && dy != 0
-    dx *= 0.7071
-    dy *= 0.7071
-  end
-  [dx, dy]
 end
