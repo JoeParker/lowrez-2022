@@ -1,8 +1,8 @@
 PLAYER_WIDTH = 6
 MOVE_SPEED = 0.1
 
-PLAYER_PROJECTILE_SPEED = 0.08
-ENEMY_PROJECTILE_SPEED = 0.08
+PLAYER_PROJECTILE_SPEED = 0.10
+ENEMY_PROJECTILE_SPEED = 0.06
 
 def render_game args, lowrez_sprites
   args.state.background ||= {
@@ -60,15 +60,26 @@ def kill_enemies args
   end
 end
 
+def calculate_spawn_point
+  case rand(3)
+  when 0 # Spawn from left
+    [-5, rand(70)]
+  when 1 # Spawn from right
+    [70, rand(70)]
+  when 2 # Spawn from above
+    [rand(70), 70]
+  end
+end
+
 def spawn_enemies args
   # Spawn enemies more frequently as the player's score increases.
   if rand < (100+args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
-    theta = rand * Math::PI * 2
+    x, y = calculate_spawn_point
     args.state.enemies << {
-        x: 32 + Math.cos(theta) * 8, y: 32 + Math.sin(theta) * 8, # TODO calculate random starting point somewhere closely outside the screen bounds
-        w: 2, h: 3, 
-        path: 'assets/sprites/enemy-missile.png',
-        angle: 0
+      x: x, y: y,
+      w: 2, h: 3, 
+      path: 'assets/sprites/enemy-missile.png',
+      angle: 0
     }
   end
 end
