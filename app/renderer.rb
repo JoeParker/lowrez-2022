@@ -1,25 +1,89 @@
-PLAYER_WIDTH = 8
+PLAYER_WIDTH = 6
 MOVE_SPEED = 0.1
 
 def render_game args, lowrez_sprites
+  args.state.background ||= {
+    x: 0, y: 0,
+    w: 64, h: 64,
+    path: "assets/sprites/bg-64.png"
+  }
+  lowrez_sprites << [args.state.background]
+
   args.state.player ||= {
     x: 28, y: 28, 
     w: PLAYER_WIDTH, h: PLAYER_WIDTH, 
     vx: 0, vy: 0, 
     direction: 1,
-    started_moving_at: nil,
+    started_moving_at: 0,#nil,
     health: 10, 
     cooldown: 0, 
     score: 0
   }
   args.state.player[:r] = args.state.player[:g] = args.state.player[:b] = (args.state.player[:health] * 25.5).clamp(0, 255)
 
-  if args.state.player.started_moving_at
-    lowrez_sprites << [running_sprite(args)]
-  else
-    lowrez_sprites << [idle_sprite(args)]
-  end
+  args.state.player_bullets ||= []
 
+  lowrez_sprites << [args.state.player_bullets]
+
+  # if args.state.player.started_moving_at
+    lowrez_sprites << [running_sprite(args)]
+  # else
+    # lowrez_sprites << [idle_sprite(args)]
+  # end
+
+end
+
+def move_bullets args
+  args.state.player_bullets.each do |bullet|
+    # Move the bullets according to the bullet's velocity
+    bullet.x += bullet[:vx]
+    bullet.y += bullet[:vy]
+  end
+  args.state.player_bullets.reject! do |bullet|
+    # Despawn bullets that are outside the screen area
+    bullet.x < -0 || bullet.y < -0 || bullet.x > 70 || bullet.y > 70
+  end
+end
+
+def fire_player args
+  # Reduce the firing cooldown each tick
+  args.state.player[:cooldown] -= 1
+  # If the player is allowed to fire
+  if args.state.player[:cooldown] <= 0
+    dx, dy = shoot_directional_vector args # Get the bullet velocity
+    return if dx == 0 && dy == 0 # If the velocity is zero, the player doesn't want to fire. Therefore, we just return early.
+    # Add a new bullet to the list of player bullets.
+    args.state.player_bullets << {
+        x:     args.state.player.x + 2 + 4 * dx,
+        y:     args.state.player.y + 2 + 4 * dy,
+        w:     2, h: 1,
+        path:  'assets/sprites/player-bullet.png',
+        flip_horizontally: args.state.player.direction > 0,
+        # r:     0, g: 0, b: 0,
+        vx:    4 * dx + args.state.player[:vx] / 1.5, vy: 4 * dy + args.state.player[:vy] / 1.5, # Factor in a bit of the player's velocity
+        kills: 0
+    }
+    args.state.player[:cooldown] = 30 # Reset the cooldown
+  end
+end
+
+# Custom function for getting a directional vector just for shooting using the arrow keys
+def shoot_directional_vector args
+  dx = 0
+  # dx += 0.1 if args.inputs.keyboard.key_down.right || args.inputs.keyboard.key_held.right
+  # dx -= 0.1 if args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_held.left
+  dy = 0
+  # dy += 0.1 if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_held.up
+  # dy -= 0.1 if args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_held.down
+
+  dx += 0.1 if args.inputs.keyboard.key_down.space && args.state.player.direction < 0
+  dx -= 0.1 if args.inputs.keyboard.key_down.space && args.state.player.direction > 0
+
+  if dx != 0 && dy != 0
+    dx *= 0.7071
+    dy *= 0.7071
+  end
+  [dx, dy]
 end
 
 def idle_sprite args
@@ -53,7 +117,7 @@ def running_sprite args
     y: args.state.player.y,
     w: args.state.player.w,
     h: args.state.player.h,
-    path: 'assets/sprites/player-run.png',
+    path: 'assets/sprites/enemy-fly.png',
     tile_x: 0 + (tile_index * args.state.player.w),
     tile_y: 0,
     tile_w: args.state.player.w,
@@ -101,9 +165,12 @@ def move_directional_vector args
     args.state.player.started_moving_at ||= args.state.tick_count
   end
 
-  if !args.inputs.keyboard.directional_vector
-    args.state.player.started_moving_at = nil
-  end
+  # Stop the sprite animation when stationary:
+  # e.g. for flying animations we don't want this
+  #
+  # if !args.inputs.keyboard.directional_vector
+  #   args.state.player.started_moving_at = nil
+  # end
 
   if dx != 0 && dy != 0
     dx *= 0.7071
