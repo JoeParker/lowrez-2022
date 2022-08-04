@@ -28,6 +28,46 @@ def initialise_player args
   end
 end
 
+def render_game_over args, lowrez_labels
+  return unless args.state.scene == :game_over && args.state.player.health <= 0
+
+  case args.state.player.score
+  when -(1.0 / 0)..-1
+    rank = "How?"
+  when 0
+    rank = "Embarrassing"
+  when 1..9
+    rank = "Minion"
+  else
+    rank = "Legendary"
+  end
+
+  lowrez_labels << { x: 0, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 2 }
+  lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 2, r: 255, g: 255, b: 255 }
+
+  reset_game args.state.player, args if args.keyboard.key_down.space
+end
+
+def reset_game player, args
+  player.health = 5
+  player.score = 0
+  player.x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
+  player.y = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
+  player.vx = 0
+  player.vy = 0
+  player.direction = 1
+  args.state.player_bullets.clear
+  args.state.enemies.clear
+  change_to_scene args, :game 
+end
+
+def change_to_scene args, scene
+    args.state.scene = scene
+    args.state.scene_at = args.state.tick_count
+    args.inputs.keyboard.clear
+    args.inputs.controller_one.clear
+end
+
 def render_ui args, lowrez_labels
   if DISPLAY_TICKS
     lowrez_labels << {
@@ -56,7 +96,7 @@ def draw_health args
     args.state.healthbar = []
     args.state.player.health.times do |index|
       args.state.healthbar << {
-        x: 58 - index * 6, y: 58,
+        x: 59 - index * 6, y: 59,
         w: 5, h: 5,
         path: "assets/sprites/heart.png"
       }
