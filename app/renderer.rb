@@ -1,23 +1,27 @@
 ###################################################################################
-# MANAGES UI AND SPRITE ANIMATIONS FOR ENTITIES ON THE SCREEN
+# MANAGES UI AND SPRITE ANIMATIONS
 ###################################################################################
 
+# Render Constants
+SCREEN_WIDTH = 64
 PLAYER_WIDTH = 6
 
-# Debug settings:
+# Debug settings
 DISPLAY_GRID = false # Display 64x64 grid overlay
 DISPLAY_TICKS = false # Display frame counter
 
 def initialise_player args
   if args.state.player == nil || !args.state.player.health.is_a?(Numeric) # If there's an issue on game reset, reinitialise the player state
     args.state.player = {
-        x: 28, y: 28, 
-        w: PLAYER_WIDTH, h: PLAYER_WIDTH, 
+        x: SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2, 
+        y: SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2, 
+        w: PLAYER_WIDTH, 
+        h: PLAYER_WIDTH, 
         vx: 0, vy: 0, 
         direction: 1,
         path: "assets/sprites/enemy-fly.png",
         started_moving_at: 0, # This would be set to nil initially if we wanted the sprite to start idle
-        health: 10, 
+        health: 5, 
         cooldown: 0, 
         score: 0
       }
@@ -46,12 +50,27 @@ def render_ui args, lowrez_labels
   }
 end
 
+def draw_health args
+  # If health has changed, re-render the healthbar
+  if args.state.healthbar.length() != args.state.player.health
+    args.state.healthbar = []
+    args.state.player.health.times do |index|
+      args.state.healthbar << {
+        x: 58 - index * 6, y: 58,
+        w: 5, h: 5,
+        path: "assets/sprites/heart.png"
+      }
+    end
+  end
+  
+end
+
 def render_game args, lowrez_sprites
   args.state.show_gridlines = DISPLAY_GRID
 
   args.state.background ||= {
     x: 0, y: 0,
-    w: 64, h: 64,
+    w: SCREEN_WIDTH, h: SCREEN_WIDTH,
     path: "assets/sprites/bg-64.png"
   }
   lowrez_sprites << [args.state.background]
@@ -73,16 +92,6 @@ def render_game args, lowrez_sprites
     # lowrez_sprites << [idle_sprite(args)]
   # end
 
-end
-
-def draw_health args
-  args.state.player.health.clamp(0, 10).times do |index|
-    args.state.healthbar << {
-      x: 62 - index * 2, y: 62,
-      w: 1, h: 1,
-      r: 255, g: 0, b: 0
-    }
-  end
 end
 
 def calculate_spawn_point

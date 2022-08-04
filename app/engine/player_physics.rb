@@ -10,7 +10,7 @@ def move_player args
     dx, dy = move_directional_vector args
     # Take the weighted average of the old velocities and the desired velocities. 
     # Since move_directional_vector returns values between -1 and 1, 
-    #   and we want to limit the speed to 7.5, we multiply dx and dy by 7.5*0.1 to get 0.75
+    # we can limit the speed here.
     args.state.player[:vx] = args.state.player[:vx] * 0.9 + dx * 0.75
     args.state.player[:vy] = args.state.player[:vy] * 0.9 + dy * 0.75
     # Move the player
@@ -45,7 +45,7 @@ def move_player args
     end
   
     # Stop the sprite animation when stationary:
-    # e.g. for flying animations we don't want this
+    # (e.g. for flying animations we don't want this, so leave it commented)
     #
     # if !args.inputs.keyboard.directional_vector
     #   args.state.player.started_moving_at = nil
@@ -70,8 +70,9 @@ def move_player args
     end
   end
 
-# Custom function for getting a directional vector just for shooting using the arrow keys
+# Custom function for getting a directional vector just for shooting
 def shoot_directional_vector args
+    # Abandoned 4d shooting in favour of shooting based on player direction
     dx = 0
     # dx += 0.1 if args.inputs.keyboard.key_down.right || args.inputs.keyboard.key_held.right
     # dx -= 0.1 if args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_held.left

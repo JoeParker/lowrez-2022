@@ -30,5 +30,5 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
   move_enemies args
   kill_enemies args
 
-  args.state.clear! if args.state.player[:health] < 0
+  args.state.clear! if args.state.player[:health] <= 0
 end

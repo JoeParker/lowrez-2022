@@ -29,8 +29,8 @@ def kill_enemies args
         args.state.player_bullets.any? do |bullet|
           # Check if enemy and bullet are within 2 pixels of each other (i.e. overlapping)
           if 4 > (enemy.x - bullet.x) ** 2 + (enemy.y - bullet.y) ** 2
-            # Increase player health by one for each enemy killed by a bullet after the first enemy, up to a maximum of 10 HP
-            args.state.player[:health] += 1 if args.state.player[:health] < 10 && bullet[:kills] > 0
+            # Increase player health by one for each enemy killed by a bullet after the first enemy, up to a maximum of 5 HP
+            args.state.player[:health] += 1 if args.state.player[:health] < 5 && bullet[:kills] > 0
             # Keep track of how many enemies have been killed by this particular bullet
             bullet[:kills] += 1
             # Earn more points by killing multiple enemies with one shot.
