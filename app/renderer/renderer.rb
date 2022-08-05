@@ -171,7 +171,7 @@ def change_to_scene args, scene
     args.inputs.controller_one.clear
 end
 
-def render_ui args, lowrez_labels
+def render_game_ui args, lowrez_labels
   if DISPLAY_TICKS
     lowrez_labels << {
       x: 0,

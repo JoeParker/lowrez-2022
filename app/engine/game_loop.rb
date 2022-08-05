@@ -19,7 +19,6 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
 
   # Render
   render_game args, lowrez_sprites
-  render_ui args, lowrez_labels
 
   case args.state.scene
   when :menu
@@ -27,6 +26,8 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
   when :controls
     render_controls args, lowrez_sprites
   when :game
+    render_game_ui args, lowrez_labels
+    
     # Player physics
     move_player args
     move_bullets args
