@@ -6,6 +6,8 @@
 SCREEN_WIDTH = 64
 PLAYER_WIDTH = 6
 
+LOADING_TRANSITION_SPEED = 6
+
 # Debug settings
 DISPLAY_GRID = false # Display 64x64 grid overlay
 DISPLAY_TICKS = false # Display frame counter
@@ -53,7 +55,7 @@ end
 
 
 def render_menu args, lowrez_sprites
-  return unless args.state.scene == :menu
+  return unless args.state.scene == :menu || args.state.loading
 
   args.state.menu_focus ||= :start
 
@@ -62,21 +64,42 @@ def render_menu args, lowrez_sprites
 
   case args.state.menu_focus
   when :start
-    lowrez_sprites << {
+    menu_background = {
       x: 0, y: 0,
       w: SCREEN_WIDTH, h: SCREEN_WIDTH,
       path: "assets/scenes/menu-1.png"
     }
+    lowrez_sprites << menu_background
   when :help
-    lowrez_sprites << {
+    menu_background = {
       x: 0, y: 0,
       w: SCREEN_WIDTH, h: SCREEN_WIDTH,
       path: "assets/scenes/menu-2.png"
     }
+    lowrez_sprites << menu_background
   end
 
-  change_to_scene args, :game if args.keyboard.key_down.enter && args.state.menu_focus == :start
   change_to_scene args, :controls if args.keyboard.key_down.enter && args.state.menu_focus == :help
+
+  if args.keyboard.key_down.enter && args.state.menu_focus == :start
+    args.state.started_loading_at ||= args.state.tick_count
+  end
+
+  # Animation the transition between menu and game
+  if args.state.started_loading_at != nil 
+    diff = args.state.tick_count - args.state.started_loading_at
+    
+    menu_background.w += diff * LOADING_TRANSITION_SPEED
+    menu_background.h += diff * LOADING_TRANSITION_SPEED
+
+    menu_background.x -= diff * LOADING_TRANSITION_SPEED / 2
+    menu_background.y -= diff * LOADING_TRANSITION_SPEED / 2
+    
+    if args.state.tick_count - args.state.started_loading_at > 60
+      args.state.started_loading_at = nil
+      change_to_scene args, :game 
+    end
+  end
 end
 
 def render_controls args, lowrez_sprites
