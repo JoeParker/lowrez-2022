@@ -52,7 +52,7 @@ def animate_player_death player, time_elapsed
 end
 
 
-def render_menu args, lowrez_labels, lowrez_sprites
+def render_menu args, lowrez_sprites
   return unless args.state.scene == :menu
 
   args.state.menu_focus ||= :start
@@ -75,10 +75,20 @@ def render_menu args, lowrez_labels, lowrez_sprites
     }
   end
 
-  lowrez_labels << { x: 0, y: 60, text: "Bat out of Heck" }
-  lowrez_labels << { x: 0, y: 10, text: "Hit [Enter] to Begin" }
+  change_to_scene args, :game if args.keyboard.key_down.enter && args.state.menu_focus == :start
+  change_to_scene args, :controls if args.keyboard.key_down.enter && args.state.menu_focus == :help
+end
 
-  change_to_scene args, :game if args.keyboard.key_down.enter
+def render_controls args, lowrez_sprites
+  return unless args.state.scene == :controls
+
+  lowrez_sprites << {
+    x: 0, y: 0,
+    w: SCREEN_WIDTH, h: SCREEN_WIDTH,
+    path: "assets/scenes/controls.png"
+  }
+
+  change_to_scene args, :menu if args.keyboard.key_down.enter || args.keyboard.key_down.escape
 end
 
 def render_game_over args, lowrez_labels
@@ -202,6 +212,7 @@ def render_game args, lowrez_sprites
     # lowrez_sprites << [idle_sprite(args)]
   # end
 
+  return_to_menu args if args.keyboard.key_down.escape
 end
 
 def calculate_spawn_point
