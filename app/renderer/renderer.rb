@@ -51,6 +51,36 @@ def animate_player_death player, time_elapsed
   end
 end
 
+
+def render_menu args, lowrez_labels, lowrez_sprites
+  return unless args.state.scene == :menu
+
+  args.state.menu_focus ||= :start
+
+  args.state.menu_focus = :start if args.keyboard.key_down.up || args.keyboard.key_down.w
+  args.state.menu_focus = :help if args.keyboard.key_down.down || args.keyboard.key_down.s
+
+  case args.state.menu_focus
+  when :start
+    lowrez_sprites << {
+      x: 0, y: 0,
+      w: SCREEN_WIDTH, h: SCREEN_WIDTH,
+      path: "assets/scenes/menu-1.png"
+    }
+  when :help
+    lowrez_sprites << {
+      x: 0, y: 0,
+      w: SCREEN_WIDTH, h: SCREEN_WIDTH,
+      path: "assets/scenes/menu-2.png"
+    }
+  end
+
+  lowrez_labels << { x: 0, y: 60, text: "Bat out of Heck" }
+  lowrez_labels << { x: 0, y: 10, text: "Hit [Enter] to Begin" }
+
+  change_to_scene args, :game if args.keyboard.key_down.enter
+end
+
 def render_game_over args, lowrez_labels
   return unless args.state.scene == :game_over #&& args.state.player.health <= 0
 
@@ -77,7 +107,13 @@ def render_game_over args, lowrez_labels
     lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 2, r: 255, g: 255, b: 255 }
   end
 
-  reset_game args.state.player, args if args.keyboard.key_down.space
+  reset_game args.state.player, args if args.keyboard.key_down.enter
+  return_to_menu args if args.keyboard.key_down.escape
+end
+
+def return_to_menu args
+  reset_game args.state.player, args
+  change_to_scene args, :menu 
 end
 
 def reset_game player, args
@@ -145,7 +181,7 @@ def render_game args, lowrez_sprites
   args.state.background ||= {
     x: 0, y: 0,
     w: SCREEN_WIDTH, h: SCREEN_WIDTH,
-    path: "assets/sprites/bg-64.png"
+    path: "assets/scenes/game.png"
   }
   lowrez_sprites << [args.state.background]
 

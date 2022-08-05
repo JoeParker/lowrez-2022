@@ -13,16 +13,18 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
 
   # Initialise game state
   args.state.tick_count ||= -1
-  args.state.scene ||= :game
+  args.state.scene ||= :menu
 
   initialise_player args
 
   # Render
   render_game args, lowrez_sprites
   render_ui args, lowrez_labels
-  render_game_over args, lowrez_labels
 
-  if args.state.scene == :game
+  case args.state.scene
+  when :menu
+    render_menu args, lowrez_labels, lowrez_sprites
+  when :game
     # Player physics
     move_player args
     move_bullets args
@@ -32,6 +34,8 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     spawn_enemies args
     move_enemies args
     kill_enemies args
+  when :game_over
+    render_game_over args, lowrez_labels
   end
 
   enable_debug_controls args
