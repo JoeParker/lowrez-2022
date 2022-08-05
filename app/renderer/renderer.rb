@@ -19,7 +19,8 @@ def initialise_player args
         h: PLAYER_WIDTH, 
         vx: 0, vy: 0, 
         direction: 1,
-        path: "assets/sprites/enemy-fly.png",
+        path: "assets/sprites/player-fly.png",
+        angle: 0,
         started_moving_at: 0, # This would be set to nil initially if we wanted the sprite to start idle
         health: 5, 
         cooldown: 0, 
@@ -28,8 +29,37 @@ def initialise_player args
   end
 end
 
+def animate_player_death player, time_elapsed
+  player.angle -= 1 # TODO: Why doesn't this work?
+
+  # Too lazy to do this mathematically - revisit it later
+  case time_elapsed
+  when 0..5
+    player.y += 1.0
+  when 6..10
+    player.y += 0.6
+  when 11..15
+    player.y += 0.1
+  when 16..20
+    player.y -= 0.1
+  when 21..25
+    player.y -= 0.4
+  when 26..30
+    player.y -= 0.8
+  else
+    player.y -= 1.5
+  end
+end
+
 def render_game_over args, lowrez_labels
-  return unless args.state.scene == :game_over && args.state.player.health <= 0
+  return unless args.state.scene == :game_over #&& args.state.player.health <= 0
+
+  args.state.player.time_of_death ||= args.state.tick_count
+  args.state.player.started_moving_at = nil
+
+  time_elapsed = args.state.tick_count - args.state.player.time_of_death
+
+  animate_player_death args.state.player, time_elapsed
 
   case args.state.player.score
   when -(1.0 / 0)..-1
@@ -42,8 +72,10 @@ def render_game_over args, lowrez_labels
     rank = "Legendary"
   end
 
-  lowrez_labels << { x: 0, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 2 }
-  lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 2, r: 255, g: 255, b: 255 }
+  if time_elapsed > 45 
+    lowrez_labels << { x: 0, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 2 }
+    lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 2, r: 255, g: 255, b: 255 }
+  end
 
   reset_game args.state.player, args if args.keyboard.key_down.space
 end
@@ -56,6 +88,8 @@ def reset_game player, args
   player.vx = 0
   player.vy = 0
   player.direction = 1
+  player.time_of_death = nil
+  args.state.player.started_moving_at = 0
   args.state.player_bullets.clear
   args.state.enemies.clear
   change_to_scene args, :game 
@@ -211,7 +245,7 @@ def running_sprite args
     y: args.state.player.y,
     w: args.state.player.w,
     h: args.state.player.h,
-    path: 'assets/sprites/enemy-fly.png',
+    path: 'assets/sprites/player-fly.png',
     tile_x: 0 + (tile_index * args.state.player.w),
     tile_y: 0,
     tile_w: args.state.player.w,

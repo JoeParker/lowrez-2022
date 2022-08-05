@@ -34,6 +34,12 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     kill_enemies args
   end
 
+  enable_debug_controls args
+
   # args.state.clear! 
   change_to_scene args, :game_over if args.state.player[:health] <= 0
+end
+
+def enable_debug_controls args
+  change_to_scene args, :game_over if args.keyboard.key_down.g
 end
