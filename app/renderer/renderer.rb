@@ -27,7 +27,8 @@ def initialise_player args
         health: 5, 
         cooldown: 0, 
         score: 0,
-        active_power_up: nil
+        active_power_up: nil,
+        grabbing: false
       }
   end
 end
@@ -283,7 +284,7 @@ end
 def spawn_tanks args
   # Limit to max 1 tank on screen at once
   # And dont spawn tanks until score is at least 20
-  return if args.state.tanks.length >= 1 || args.state.player[:score] < 20
+  return if (args.state.tanks.length >= 1 || args.state.player[:score] < 20) unless args.keyboard.key_down.t # DEBUG
 
   # Spawn enemies more frequently as the player's score increases.
   if rand < (75+args.state.player[:score])/(20000 + args.state.player[:score]) || args.keyboard.key_down.t # DEBUG
@@ -299,7 +300,8 @@ def spawn_tanks args
     args.state.tanks << {
       x: x, y: 0,
       w: 7, h: 7,
-      path: "assets/sprites/enemy-tank.png"
+      path: "assets/sprites/enemy-tank.png",
+      grab_state: nil
     }
   end
 end

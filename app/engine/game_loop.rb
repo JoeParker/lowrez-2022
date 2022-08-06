@@ -36,6 +36,8 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     move_player args
     move_bullets args
     fire_player args
+    grab_attack_player args
+    drop_attack_player args
 
     # Enemy physics
     spawn_enemies args
@@ -47,6 +49,8 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     move_tank_bullets args
     fire_tank args
     destroy_tank_bullets args
+    carry_tanks args
+    drop_tanks args
 
     # Power ups
     spawn_power_ups args

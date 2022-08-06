@@ -89,3 +89,32 @@ def shoot_directional_vector args
     end
     [dx, dy]
   end
+
+
+def grab_attack_player args
+  # The player can only grab one enemy at a time
+  return if args.state.player.grabbing
+
+  # 1. Tanks
+  args.state.tanks.each do |tank|
+    # Check if player and tank are within 4 pixels of each other (i.e. overlapping)
+    if 16 > (args.state.player.x - tank.x) ** 2 + (args.state.player.y - tank.y) ** 2
+      args.state.player.grabbing = true
+      tank.grab_state = :grabbed
+    end 
+  end
+end
+
+def drop_attack_player args
+  return unless args.state.player.grabbing
+
+  if args.keyboard.key_down.space
+    # Find the currently grabbed enemy
+    args.state.tanks.each do |tank|
+      # Set the tank to falling
+      tank.grab_state = :falling if tank.grab_state == :grabbed
+    end
+    # The player is now free to grab some more stuff
+    args.state.player.grabbing = false
+  end
+end

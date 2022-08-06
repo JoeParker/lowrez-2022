@@ -46,6 +46,9 @@ end
 
 def move_tanks args
   args.state.tanks.each do |tank|
+    # Skip this tank if its grabbed, or falling
+    next unless tank.grab_state == nil
+    
     # Is the player left or right of the tank?
     move_left = args.state.player[:x] < tank[:x]
     # Move the tank towards the player
@@ -53,6 +56,31 @@ def move_tanks args
       tank.x -= ENEMY_TANK_SPEED
     else
       tank.x += ENEMY_TANK_SPEED
+    end
+  end
+end
+
+def carry_tanks args
+  args.state.tanks.each do |tank|
+    if tank.grab_state == :grabbed
+      tank.x = args.state.player.x
+      tank.y = args.state.player.y - 3
+      tank.angle = 25 if args.state.player.direction > 0
+      tank.angle = -25 if args.state.player.direction < 0
+    end
+  end
+end
+
+def drop_tanks args
+  args.state.tanks.each do |tank|
+    if tank.grab_state == :falling
+      tank.y -= 0.4
+      # tank.x += args.state.player.vx # TODO: cache players velocity at time of drop and inject it here
+      tank.angle -= 5
+      # Despawn tanks at the ground
+      args.state.tanks.reject! do |tank|
+        tank.y < 0
+      end
     end
   end
 end
