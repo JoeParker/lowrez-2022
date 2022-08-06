@@ -3,6 +3,7 @@
 ###################################################################################
 
 ENEMY_PROJECTILE_SPEED = 0.06
+ENEMY_TANK_SPEED = 0.06
 
 def move_enemies args
   args.state.enemies.each do |enemy|
@@ -39,6 +40,19 @@ def kill_enemies args
           args.state.player[:score]  += bullet[:kills]
         end
       end
+    end
+  end
+end
+
+def move_tanks args
+  args.state.tanks.each do |tank|
+    # Is the player left or right of the tank?
+    move_left = args.state.player[:x] < tank[:x]
+    # Move the tank towards the player
+    if move_left
+      tank.x -= ENEMY_TANK_SPEED
+    else
+      tank.x += ENEMY_TANK_SPEED
     end
   end
 end

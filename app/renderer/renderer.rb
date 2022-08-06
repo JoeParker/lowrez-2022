@@ -242,6 +242,9 @@ def render_game args, lowrez_sprites
     # lowrez_sprites << [idle_sprite(args)]
   # end
 
+  args.state.tanks ||= []
+  lowrez_sprites << [args.state.tanks]
+
   args.state.power_ups ||= []
   lowrez_sprites << [args.state.power_ups]
 
@@ -268,6 +271,29 @@ def spawn_enemies args
       w: 2, h: 3, 
       path: 'assets/sprites/enemy-missile.png',
       angle: 0
+    }
+  end
+end
+
+def spawn_tanks args
+  # Limit to max 1 tank on screen at once
+  return if args.state.tanks.length >= 1
+
+  # Spawn enemies more frequently as the player's score increases.
+  if rand < (75+args.state.player[:score])/(20000 + args.state.player[:score]) || args.keyboard.key_down.t # DEBUG
+
+    # Spawn from bottom left/right only
+    case rand(2)
+    when 0 # Spawn from left
+      x = -5
+    when 1 # Spawn from right
+      x = 70
+    end
+
+    args.state.tanks << {
+      x: x, y: 0,
+      w: 7, h: 7,
+      path: "assets/sprites/enemy-tank.png"
     }
   end
 end

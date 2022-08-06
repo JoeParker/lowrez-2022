@@ -42,6 +42,9 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     move_enemies args
     kill_enemies args
 
+    spawn_tanks args
+    move_tanks args
+
     # Power ups
     spawn_power_ups args
     move_power_ups args

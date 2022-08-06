@@ -37,7 +37,7 @@ def activate_power_up args, effect
   case effect
   when :health
     args.state.player.health += 1
-    args.state.player.health - args.state.player.health.clamp(0, 5)# = 5 if args.state.player[:health] > 5
+    args.state.player.health = args.state.player.health.clamp(0, 5)# = 5 if args.state.player[:health] > 5
   when :lifesteal
     args.state.player.active_power_up = :lifesteal
   else
