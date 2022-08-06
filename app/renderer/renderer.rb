@@ -26,7 +26,8 @@ def initialise_player args
         started_moving_at: 0, # This would be set to nil initially if we wanted the sprite to start idle
         health: 5, 
         cooldown: 0, 
-        score: 0
+        score: 0,
+        active_power_up: nil
       }
   end
 end
@@ -155,6 +156,7 @@ def reset_game player, args
   player.vx = 0
   player.vy = 0
   player.direction = 1
+  player.active_power_up = nil
   player.time_of_death = nil
   args.state.player.started_moving_at = 0
   args.state.player_bullets.clear
@@ -267,17 +269,28 @@ end
 def spawn_power_ups args
   # Power-up spawns once every 10 seconds
   if (args.state.tick_count % 600 == 0) || args.keyboard.key_down.p # DEBUG
+
+    # Determine a random power-up type
+    # Health drops are the most common
+    case rand(4)
+    when 0..2
+      effect = :health
+    when 3
+      effect = :lifesteal
+    end
+
     # Spawn from above only, and within screen x bounds
     x, y = [rand(56) + 4, 70]
+
     args.state.power_ups << {
       x: x, y: y,
       w: 8, h: 8,
-      path: "assets/sprites/power-up.png",
+      path: "assets/sprites/power-up-#{effect}.png",
       angle: 0,
       angle_anchor_x: 0.5,
       angle_anchor_y: 0.5,
       swaying: :right,
-      effect: :health
+      effect: effect
     }
   end
 end
