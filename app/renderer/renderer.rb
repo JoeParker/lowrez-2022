@@ -165,9 +165,11 @@ def reset_game player, args
   args.state.player.started_moving_at = 0
   args.state.player_bullets.clear
   args.state.enemies.clear
+  args.state.tanks.clear
+  args.state.tank_bullets.clear
   args.state.power_ups.clear
 
-  args.outputs.sounds << "assets/audio/music/game.ogg"
+  args.outputs.sounds << "assets/audio/music/game.ogg" unless args.state.scene == :controls
   change_to_scene args, :game 
 end
 
@@ -245,6 +247,9 @@ def render_game args, lowrez_sprites
   args.state.tanks ||= []
   lowrez_sprites << [args.state.tanks]
 
+  args.state.tank_bullets ||= []
+  lowrez_sprites << [args.state.tank_bullets]
+
   args.state.power_ups ||= []
   lowrez_sprites << [args.state.power_ups]
 
@@ -277,7 +282,8 @@ end
 
 def spawn_tanks args
   # Limit to max 1 tank on screen at once
-  return if args.state.tanks.length >= 1
+  # And dont spawn tanks until score is at least 20
+  return if args.state.tanks.length >= 1 || args.state.player[:score] < 20
 
   # Spawn enemies more frequently as the player's score increases.
   if rand < (75+args.state.player[:score])/(20000 + args.state.player[:score]) || args.keyboard.key_down.t # DEBUG
@@ -324,6 +330,22 @@ def spawn_power_ups args
       swaying: :right,
       effect: effect
     }
+  end
+end
+
+def fire_tank args
+  args.state.tanks.each do |tank|
+    # Shoot once every 3 seconds
+    if args.state.tick_count % 180 == 0
+      # Add a new bullet to the list of tank bullets.
+      args.state.tank_bullets << {
+          x:     tank.x + 3,
+          y:     tank.y + 7,
+          w:     2, h: 1,
+          path:  'assets/sprites/player-bullet.png',
+          angle: 90
+      }
+    end
   end
 end
 

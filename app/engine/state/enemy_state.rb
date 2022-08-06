@@ -56,3 +56,24 @@ def move_tanks args
     end
   end
 end
+
+def move_tank_bullets args
+  args.state.tank_bullets.each do |bullet|
+    # Move the bullets according to the bullet's velocity
+    bullet.y += 0.2
+  end
+  args.state.tank_bullets.reject! do |bullet|
+    # Despawn bullets that are outside the screen area
+    bullet.x < 0 || bullet.y < 0 || bullet.x > 70 || bullet.y > 70
+  end
+end
+
+def destroy_tank_bullets args 
+  args.state.tank_bullets.reject! do |enemy|
+    # Check if bullet and player are within 3 pixels of each other (i.e. overlapping)
+    if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
+      # Bullet is touching player. Destroy bullet, and reduce player HP by 1.
+      args.state.player[:health] -= 1
+    end
+  end
+end
