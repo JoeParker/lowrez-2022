@@ -75,7 +75,7 @@ def drop_tanks args
   args.state.tanks.each do |tank|
     if tank.grab_state == :falling
       tank.y -= 0.4
-      # tank.x += args.state.player.vx # TODO: cache players velocity at time of drop and inject it here
+      tank.x += args.state.player_dropped_vx
       tank.angle -= 5
       # Despawn tanks at the ground
       args.state.tanks.reject! do |tank|
