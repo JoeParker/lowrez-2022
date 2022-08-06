@@ -6,6 +6,7 @@
 require 'app/renderer/renderer.rb'
 require 'app/engine/state/player_state.rb'
 require 'app/engine/state/enemy_state.rb'
+require 'app/engine/state/power_up_state.rb'
 
 PLAYER_WIDTH = 6
 
@@ -37,6 +38,11 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     spawn_enemies args
     move_enemies args
     kill_enemies args
+
+    # Power ups
+    spawn_power_ups args
+    move_power_ups args
+    destroy_power_ups args
   when :game_over
     render_game_over args, lowrez_labels
   end

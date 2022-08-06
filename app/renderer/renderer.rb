@@ -32,7 +32,7 @@ def initialise_player args
 end
 
 def animate_player_death player, time_elapsed
-  player.angle -= 1 # TODO: Why doesn't this work?
+  # player.angle -= 1 # TODO: Why doesn't this work?
 
   # Too lazy to do this mathematically - revisit it later
   case time_elapsed
@@ -79,11 +79,9 @@ def render_menu args, lowrez_sprites
     lowrez_sprites << menu_background
   end
 
-  change_to_scene args, :controls if args.keyboard.key_down.enter && args.state.menu_focus == :help
-
-  if args.keyboard.key_down.enter && args.state.menu_focus == :start
-    args.state.started_loading_at ||= args.state.tick_count
-  end
+  # Input listeners
+  change_to_scene args, :controls if (args.keyboard.key_down.enter || args.keyboard.key_down.space) && args.state.menu_focus == :help
+  args.state.started_loading_at ||= args.state.tick_count if (args.keyboard.key_down.enter || args.keyboard.key_down.space) && args.state.menu_focus == :start
 
   # Animation the transition between menu and game
   if args.state.started_loading_at != nil 
@@ -111,7 +109,7 @@ def render_controls args, lowrez_sprites
     path: "assets/scenes/controls.png"
   }
 
-  change_to_scene args, :menu if args.keyboard.key_down.enter || args.keyboard.key_down.escape
+  change_to_scene args, :menu if args.keyboard.key_down.enter || args.keyboard.key_down.space || args.keyboard.key_down.escape
 end
 
 def render_game_over args, lowrez_labels
@@ -235,6 +233,9 @@ def render_game args, lowrez_sprites
     # lowrez_sprites << [idle_sprite(args)]
   # end
 
+  args.state.power_ups ||= []
+  lowrez_sprites << [args.state.power_ups]
+
   return_to_menu args if args.keyboard.key_down.escape
 end
 
@@ -258,6 +259,22 @@ def spawn_enemies args
       w: 2, h: 3, 
       path: 'assets/sprites/enemy-missile.png',
       angle: 0
+    }
+  end
+end
+
+
+
+def spawn_power_ups args
+  # TODO: randomise this, currently spawns a power up for eveyr score of 10
+  if (args.state.player[:score] > 0 && args.state.player[:score] % 10 == 0) || args.keyboard.key_down.p # DEBUG
+    args.state.power_ups << {
+      x: 28, y: 60,
+      w: 8, h: 8,
+      path: "assets/sprites/power-up.png",
+      angle: 0,
+      swaying: :right,
+      effect: :health
     }
   end
 end
