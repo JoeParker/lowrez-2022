@@ -93,6 +93,8 @@ def render_menu args, lowrez_sprites
 
     menu_background.x -= diff * LOADING_TRANSITION_SPEED / 2
     menu_background.y -= diff * LOADING_TRANSITION_SPEED / 2
+
+    args.outputs.sounds << "assets/audio/game.ogg"
     
     if args.state.tick_count - args.state.started_loading_at > 60
       args.state.started_loading_at = nil
@@ -170,6 +172,8 @@ def change_to_scene args, scene
     args.state.scene_at = args.state.tick_count
     args.inputs.keyboard.clear
     args.inputs.controller_one.clear
+    # args.outputs.sounds << "assets/audio/menu.ogg" if scene = :menu
+    # args.outputs.sounds << "assets/audio/game.ogg" if scene = :game
 end
 
 def render_game_ui args, lowrez_labels
