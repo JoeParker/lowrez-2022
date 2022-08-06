@@ -94,7 +94,7 @@ def render_menu args, lowrez_sprites
     menu_background.x -= diff * LOADING_TRANSITION_SPEED / 2
     menu_background.y -= diff * LOADING_TRANSITION_SPEED / 2
 
-    args.outputs.sounds << "assets/audio/game.ogg"
+    args.outputs.sounds << "assets/audio/music/game.ogg"
     
     if args.state.tick_count - args.state.started_loading_at > 60
       args.state.started_loading_at = nil
@@ -122,6 +122,8 @@ def render_game_over args, lowrez_labels
   args.state.player.started_moving_at = nil
 
   time_elapsed = args.state.tick_count - args.state.player.time_of_death
+
+  args.outputs.sounds << "assets/audio/sfx/game-over.wav" if time_elapsed == 0
 
   animate_player_death args.state.player, time_elapsed
 
@@ -164,6 +166,8 @@ def reset_game player, args
   args.state.player_bullets.clear
   args.state.enemies.clear
   args.state.power_ups.clear
+
+  args.outputs.sounds << "assets/audio/music/game.ogg"
   change_to_scene args, :game 
 end
 
@@ -172,8 +176,6 @@ def change_to_scene args, scene
     args.state.scene_at = args.state.tick_count
     args.inputs.keyboard.clear
     args.inputs.controller_one.clear
-    # args.outputs.sounds << "assets/audio/menu.ogg" if scene = :menu
-    # args.outputs.sounds << "assets/audio/game.ogg" if scene = :game
 end
 
 def render_game_ui args, lowrez_labels

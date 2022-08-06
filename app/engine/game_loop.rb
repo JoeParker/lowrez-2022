@@ -19,7 +19,7 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
   initialise_player args
 
   # Initialise audio
-  args.outputs.sounds << "assets/audio/menu.ogg" if args.state.scene == :menu || args.state.scene == :controls
+  args.outputs.sounds << "assets/audio/music/menu.ogg" if args.state.scene == :menu || args.state.scene == :controls
 
   # Render
   render_game args, lowrez_sprites
@@ -53,15 +53,14 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
   enable_debug_controls args
 
   # args.state.clear! 
-  if args.state.player[:health] <= 0
-    args.gtk.stop_music
-    change_to_scene args, :game_over
-  end
+  game_over args if args.state.player[:health] <= 0
+end
+
+def game_over args
+  args.gtk.stop_music
+  change_to_scene args, :game_over 
 end
 
 def enable_debug_controls args
-  if args.keyboard.key_down.g
-    args.gtk.stop_music
-    change_to_scene args, :game_over 
-  end
+  game_over args if args.keyboard.key_down.g
 end
