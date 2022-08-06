@@ -159,6 +159,7 @@ def reset_game player, args
   args.state.player.started_moving_at = 0
   args.state.player_bullets.clear
   args.state.enemies.clear
+  args.state.power_ups.clear
   change_to_scene args, :game 
 end
 
@@ -239,7 +240,7 @@ def render_game args, lowrez_sprites
   return_to_menu args if args.keyboard.key_down.escape
 end
 
-def calculate_spawn_point
+def calculate_enemy_spawn_point
   case rand(3)
   when 0 # Spawn from left
     [-5, rand(70)]
@@ -253,7 +254,7 @@ end
 def spawn_enemies args
   # Spawn enemies more frequently as the player's score increases.
   if rand < (75+args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
-    x, y = calculate_spawn_point
+    x, y = calculate_enemy_spawn_point
     args.state.enemies << {
       x: x, y: y,
       w: 2, h: 3, 
@@ -263,16 +264,18 @@ def spawn_enemies args
   end
 end
 
-
-
 def spawn_power_ups args
-  # TODO: randomise this, currently spawns a power up for eveyr score of 10
-  if (args.state.player[:score] > 0 && args.state.player[:score] % 10 == 0) || args.keyboard.key_down.p # DEBUG
+  # Power-up spawns once every 10 seconds
+  if (args.state.tick_count % 600 == 0) || args.keyboard.key_down.p # DEBUG
+    # Spawn from above only, and within screen x bounds
+    x, y = [rand(56) + 4, 70]
     args.state.power_ups << {
-      x: 28, y: 60,
+      x: x, y: y,
       w: 8, h: 8,
       path: "assets/sprites/power-up.png",
       angle: 0,
+      angle_anchor_x: 0.5,
+      angle_anchor_y: 0.5,
       swaying: :right,
       effect: :health
     }

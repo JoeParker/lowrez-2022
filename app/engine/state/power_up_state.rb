@@ -17,14 +17,14 @@ end
 
 def destroy_power_ups args 
   args.state.power_ups.reject! do |power_up|
-    # Check if power-up and player are within 4 pixels of each other (i.e. overlapping)
-    if 16 > (power_up.x - args.state.player.x) ** 2 + (power_up.y - args.state.player.y) ** 2
+    # Check if power-up and player are within 7 pixels of each other (i.e. overlapping)
+    if 49 > (power_up.x - args.state.player.x) ** 2 + (power_up.y - args.state.player.y) ** 2
       # Power-up is touching player. Remove it, and activate its effect
       activate_power_up args, power_up.effect
     else
       args.state.player_bullets.any? do |bullet|
-        # Check if power-up and bullet are within 2 pixels of each other (i.e. overlapping)
-        if 4 > (power_up.x - bullet.x) ** 2 + (power_up.y - bullet.y) ** 2
+        # Check if power-up and bullet are within 4 pixels of each other (i.e. overlapping)
+        if 16 > (power_up.x - bullet.x) ** 2 + (power_up.y - bullet.y) ** 2
           # Power-up was shot down. Destroy it (TODO: animation)
           true
         end
@@ -36,7 +36,8 @@ end
 def activate_power_up args, effect
   case effect
   when :health
-    args.state.player.health += 1 if args.state.player[:health] < 5
+    args.state.player.health += 1
+    args.state.player.health = 5 if args.state.player[:health] > 5
   else
     # Undefined power up effect type
   end
