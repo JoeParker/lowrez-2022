@@ -342,13 +342,24 @@ def fire_tank args
     if args.state.tick_count % 180 == 0
       # Add a new bullet to the list of tank bullets.
       args.state.tank_bullets << {
-          x:     tank.x + 3,
-          y:     tank.y + 7,
-          w:     1, h: 3,
-          path:  'assets/sprites/tank-bullet.png'
+        x:     tank.x + 3,
+        y:     tank.y + 7,
+        w:     1, h: 3,
+        path:  'assets/sprites/tank-bullet.png',
+        tile_x: 0, tile_y: 0,
+        tile_w: 1, tile_h: 3
       }
       args.outputs.sounds << "assets/audio/sfx/tank-fire.wav"
     end
+  end
+end
+
+def animate_tank_bullets args
+  # Animate 6 times per second
+  return unless args.state.tick_count % 10 == 0
+
+  args.state.tank_bullets.each do |bullet|
+    bullet.tile_x = rand(3) # The flame animated is simply randomised, no need to go sequentially
   end
 end
 
@@ -366,7 +377,6 @@ def fire_player args
         w:     2, h: 1,
         path:  'assets/sprites/player-bullet.png',
         flip_horizontally: args.state.player.direction > 0,
-        # r:     0, g: 0, b: 0,
         vx:    4 * dx + args.state.player[:vx] / 1.5, vy: 4 * dy + args.state.player[:vy] / 1.5, # Factor in a bit of the player's velocity
         kills: 0
     }
@@ -390,15 +400,13 @@ def running_sprite args
   if !args.state.player.started_moving_at
     tile_index = 0
   else
-    how_many_frames_in_sprite_sheet = 3
-    how_many_ticks_to_hold_each_frame = 4
-    should_the_index_repeat = true
+    frame_count = 3
+    ticks_per_frame = 4
+    repeat = true
     tile_index = args.state
                      .player
                      .started_moving_at
-                     .frame_index(how_many_frames_in_sprite_sheet,
-                                  how_many_ticks_to_hold_each_frame,
-                                  should_the_index_repeat)
+                     .frame_index(frame_count, ticks_per_frame, repeat)
   end
 
   {

@@ -47,6 +47,7 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     spawn_tanks args
     move_tanks args
     move_tank_bullets args
+    animate_tank_bullets args
     fire_tank args
     destroy_tank_bullets args
     carry_tanks args

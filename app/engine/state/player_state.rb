@@ -111,7 +111,7 @@ def drop_attack_player args
     # Find the currently grabbed enemy
     args.state.tanks.each do |tank|
       
-      if args.keyboard.key_down.space
+      if args.keyboard.key_down.space || args.keyboard.key_held.space
         # Set the tank to falling
         tank.grab_state = :falling if tank.grab_state == :grabbed
         args.state.player_dropped_vx = args.state.player[:vx]

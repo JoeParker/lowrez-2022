@@ -25,8 +25,7 @@ def kill_enemies args
     # Check if enemy and player are within 3 pixels of each other (i.e. overlapping)
     if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
       # Enemy is touching player. Kill enemy, and reduce player HP by 1.
-      args.state.player[:health] -= 1
-      args.outputs.sounds << "assets/audio/sfx/player-hit.wav"
+      damage_player args
     else
       args.state.player_bullets.any? do |bullet|
         # Check if enemy and bullet are within 2 pixels of each other (i.e. overlapping)
@@ -102,7 +101,12 @@ def destroy_tank_bullets args
     # Check if bullet and player are within 3 pixels of each other (i.e. overlapping)
     if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
       # Bullet is touching player. Destroy bullet, and reduce player HP by 1.
-      args.state.player[:health] -= 1
+      damage_player args
     end
   end
+end
+
+def damage_player args
+  args.state.player[:health] -= 1
+  args.outputs.sounds << "assets/audio/sfx/player-hit.wav"
 end
