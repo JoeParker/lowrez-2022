@@ -129,21 +129,24 @@ def render_game_over args, lowrez_labels
   animate_player_death args.state.player, time_elapsed  
   animate_game_over_text args, lowrez_labels, time_elapsed
 
-  reset_game args.state.player, args if args.keyboard.key_down.enter
+  if args.keyboard.key_down.enter
+    args.outputs.sounds << "assets/audio/sfx/power-up.wav"
+    reset_game args.state.player, args 
+  end
   return_to_menu args if args.keyboard.key_down.escape
 end
 
 def animate_game_over_text args, lowrez_labels, time_elapsed
-  # Calculate the player's rank
+  # Determine the player's rank
   case args.state.player.score
   when -(1.0 / 0)..-1
     rank = "How?"
   when 0
     rank = "Umm.."
   when 1..19
-    rank = "Nuisance"
-  when 20..49
     rank = "Pest"
+  when 20..49
+    rank = "Imp"
   when 50..99
     rank = "Scamp"
   when 100..199
@@ -158,16 +161,15 @@ def animate_game_over_text args, lowrez_labels, time_elapsed
     rank = "Demon"
   end
 
-  
-    args.outputs.sounds << "assets/audio/sfx/player-hit.wav" if [45, 75, 125, 155].include? time_elapsed
-    args.outputs.sounds << "assets/audio/sfx/power_up.wav" if time_elapsed == 200 
+  args.outputs.sounds << "assets/audio/sfx/player-hit.wav" if [45, 75, 125, 155].include? time_elapsed
+  args.outputs.sounds << "assets/audio/sfx/player-fire.wav" if time_elapsed == 200 
 
-    lowrez_labels << { x: 1, y: 40, text: "Score:", r: 11, g: 34, b: 38 } if time_elapsed >= 45 
-    lowrez_labels << { x: 30, y: 40, text: "#{args.state.player.score}", r: 171, g: 0, b: 0 } if time_elapsed >= 75
-    lowrez_labels << { x: 1, y: 30, text: "Rank:", r: 11, g: 34, b: 38 } if time_elapsed >= 125 
-    lowrez_labels << { x: 25, y: 30, text: "#{rank}", r: 171, g: 0, b: 0 } if time_elapsed >= 155 
-    lowrez_labels << { x: 18, y: 12, text: "Retry?", r: 233, g: 236, b: 232 } if time_elapsed >= 200 
-    lowrez_labels << { x: 15, y: 6, text: "[Enter]", r: 233, g: 236, b: 232} if time_elapsed >= 200 
+  lowrez_labels << { x: 1, y: 40, text: "Score:", r: 11, g: 34, b: 38 } if time_elapsed >= 45 
+  lowrez_labels << { x: 30, y: 40, text: "#{args.state.player.score}", r: 171, g: 0, b: 0 } if time_elapsed >= 75
+  lowrez_labels << { x: 1, y: 30, text: "Rank:", r: 11, g: 34, b: 38 } if time_elapsed >= 125 
+  lowrez_labels << { x: 25, y: 30, text: "#{rank}", r: 171, g: 0, b: 0 } if time_elapsed >= 155 
+  lowrez_labels << { x: 18, y: 12, text: "Retry?", r: 233, g: 236, b: 232 } if time_elapsed >= 200 
+  lowrez_labels << { x: 15, y: 6, text: "[Enter]", r: 233, g: 236, b: 232} if time_elapsed >= 200 
 end
 
 def return_to_menu args
