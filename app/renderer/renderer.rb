@@ -126,8 +126,15 @@ def render_game_over args, lowrez_labels
 
   args.outputs.sounds << "assets/audio/music/game-over.ogg" if time_elapsed == 0
 
-  animate_player_death args.state.player, time_elapsed
+  animate_player_death args.state.player, time_elapsed  
+  animate_game_over_text args, lowrez_labels, time_elapsed
 
+  reset_game args.state.player, args if args.keyboard.key_down.enter
+  return_to_menu args if args.keyboard.key_down.escape
+end
+
+def animate_game_over_text args, lowrez_labels, time_elapsed
+  # Calculate the player's rank
   case args.state.player.score
   when -(1.0 / 0)..-1
     rank = "How?"
@@ -151,13 +158,16 @@ def render_game_over args, lowrez_labels
     rank = "Demon"
   end
 
-  if time_elapsed > 45 
-    lowrez_labels << { x: 32, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 1 }
-    lowrez_labels << { x: 32, y: 40, text: "Rank: #{rank}", alignment_enum: 1, r: 255, g: 255, b: 255 }
-  end
+  
+    args.outputs.sounds << "assets/audio/sfx/player-hit.wav" if [45, 75, 125, 155].include? time_elapsed
+    args.outputs.sounds << "assets/audio/sfx/power_up.wav" if time_elapsed == 200 
 
-  reset_game args.state.player, args if args.keyboard.key_down.enter
-  return_to_menu args if args.keyboard.key_down.escape
+    lowrez_labels << { x: 1, y: 40, text: "Score:", r: 11, g: 34, b: 38 } if time_elapsed >= 45 
+    lowrez_labels << { x: 30, y: 40, text: "#{args.state.player.score}", r: 171, g: 0, b: 0 } if time_elapsed >= 75
+    lowrez_labels << { x: 1, y: 30, text: "Rank:", r: 11, g: 34, b: 38 } if time_elapsed >= 125 
+    lowrez_labels << { x: 25, y: 30, text: "#{rank}", r: 171, g: 0, b: 0 } if time_elapsed >= 155 
+    lowrez_labels << { x: 18, y: 12, text: "Retry?", r: 233, g: 236, b: 232 } if time_elapsed >= 200 
+    lowrez_labels << { x: 15, y: 6, text: "[Enter]", r: 233, g: 236, b: 232} if time_elapsed >= 200 
 end
 
 def return_to_menu args
@@ -199,9 +209,9 @@ def render_game_ui args, lowrez_labels
       x: 0,
       y: 0,
       text: "#{args.state.tick_count}",
-      r: 255,
-      g: 0,
-      b: 0
+      r: 232,
+      g: 236,
+      b: 233
   }
   end
 
@@ -209,9 +219,9 @@ def render_game_ui args, lowrez_labels
     x: 1,
     y: 59,
     text: "#{args.state.player.score}",
-    r: 0,
-    g: 255,
-    b: 0
+    r: 232,
+    g: 236,
+    b: 233
   }
 end
 
