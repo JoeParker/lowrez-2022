@@ -152,8 +152,8 @@ def render_game_over args, lowrez_labels
   end
 
   if time_elapsed > 45 
-    lowrez_labels << { x: 0, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 1 }
-    lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 1, r: 255, g: 255, b: 255 }
+    lowrez_labels << { x: 32, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 1 }
+    lowrez_labels << { x: 32, y: 40, text: "Rank: #{rank}", alignment_enum: 1, r: 255, g: 255, b: 255 }
   end
 
   reset_game args.state.player, args if args.keyboard.key_down.enter
