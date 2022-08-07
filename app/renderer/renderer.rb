@@ -132,16 +132,28 @@ def render_game_over args, lowrez_labels
   when -(1.0 / 0)..-1
     rank = "How?"
   when 0
-    rank = "Embarrassing"
-  when 1..9
-    rank = "Minion"
+    rank = "Umm.."
+  when 1..19
+    rank = "Nuisance"
+  when 20..49
+    rank = "Pest"
+  when 50..99
+    rank = "Scamp"
+  when 100..199
+    rank = "Fiend"
+  when 200..399
+    rank = "Menace"
+  when 400..649
+    rank = "Terror"
+  when 650..999
+    rank = "Hellion"
   else
-    rank = "Legendary"
+    rank = "Demon"
   end
 
   if time_elapsed > 45 
-    lowrez_labels << { x: 0, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 2 }
-    lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 2, r: 255, g: 255, b: 255 }
+    lowrez_labels << { x: 0, y: 20, text: "Score: #{args.state.player.score}", alignment_enum: 1 }
+    lowrez_labels << { x: 0, y: 10, text: "Rank: #{rank}", alignment_enum: 1, r: 255, g: 255, b: 255 }
   end
 
   reset_game args.state.player, args if args.keyboard.key_down.enter
@@ -338,8 +350,11 @@ end
 
 def fire_tank args
   args.state.tanks.each do |tank|
-    # Shoot once every 3 seconds
-    if args.state.tick_count % 180 == 0
+    # Grabbed and falling tanks cannot fire
+    return unless tank.grab_state == nil
+
+    # Shoot once every 3 seconds, after moving fully onto the screen
+    if args.state.tick_count % 180 == 0 && tank.x >= 0 && tank.x <= 60
       # Add a new bullet to the list of tank bullets.
       args.state.tank_bullets << {
         x:     tank.x + 3,

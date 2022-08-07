@@ -98,8 +98,8 @@ end
 
 def destroy_tank_bullets args 
   args.state.tank_bullets.reject! do |enemy|
-    # Check if bullet and player are within 3 pixels of each other (i.e. overlapping)
-    if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
+    # Check if bullet and player are within 4 pixels of each other (i.e. overlapping)
+    if 16 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
       # Bullet is touching player. Destroy bullet, and reduce player HP by 1.
       damage_player args
     end
