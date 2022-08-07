@@ -26,6 +26,7 @@ def kill_enemies args
     if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
       # Enemy is touching player. Kill enemy, and reduce player HP by 1.
       args.state.player[:health] -= 1
+      args.outputs.sounds << "assets/audio/sfx/player-hit.wav"
     else
       args.state.player_bullets.any? do |bullet|
         # Check if enemy and bullet are within 2 pixels of each other (i.e. overlapping)

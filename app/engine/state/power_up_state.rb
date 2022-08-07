@@ -20,12 +20,14 @@ def destroy_power_ups args
     # Check if power-up and player are within 7 pixels of each other (i.e. overlapping)
     if 49 > (power_up.x - args.state.player.x) ** 2 + (power_up.y - args.state.player.y) ** 2
       # Power-up is touching player. Remove it, and activate its effect
+      args.outputs.sounds << "assets/audio/sfx/power-up.wav"
       activate_power_up args, power_up.effect
     else
       args.state.player_bullets.any? do |bullet|
         # Check if power-up and bullet are within 4 pixels of each other (i.e. overlapping)
         if 16 > (power_up.x - bullet.x) ** 2 + (power_up.y - bullet.y) ** 2
           # Power-up was shot down. Destroy it (TODO: animation)
+          args.outputs.sounds << "assets/audio/sfx/power-up-hit.wav"
           true
         end
       end

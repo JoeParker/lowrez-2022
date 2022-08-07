@@ -124,7 +124,7 @@ def render_game_over args, lowrez_labels
 
   time_elapsed = args.state.tick_count - args.state.player.time_of_death
 
-  args.outputs.sounds << "assets/audio/sfx/game-over.wav" if time_elapsed == 0
+  args.outputs.sounds << "assets/audio/music/game-over.ogg" if time_elapsed == 0
 
   animate_player_death args.state.player, time_elapsed
 
@@ -344,10 +344,10 @@ def fire_tank args
       args.state.tank_bullets << {
           x:     tank.x + 3,
           y:     tank.y + 7,
-          w:     2, h: 1,
-          path:  'assets/sprites/player-bullet.png',
-          angle: 90
+          w:     1, h: 3,
+          path:  'assets/sprites/tank-bullet.png'
       }
+      args.outputs.sounds << "assets/audio/sfx/tank-fire.wav"
     end
   end
 end
@@ -370,6 +370,7 @@ def fire_player args
         vx:    4 * dx + args.state.player[:vx] / 1.5, vy: 4 * dy + args.state.player[:vy] / 1.5, # Factor in a bit of the player's velocity
         kills: 0
     }
+    args.outputs.sounds << "assets/audio/sfx/player-fire.wav"
     args.state.player[:cooldown] = 30 # Reset the cooldown
   end
 end

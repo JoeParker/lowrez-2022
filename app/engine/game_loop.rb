@@ -67,7 +67,6 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
 end
 
 def game_over args
-  args.gtk.stop_music
   change_to_scene args, :game_over 
 end
 
