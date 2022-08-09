@@ -1,6 +1,6 @@
 devid=joeparker
 devtitle=Joe Parker
-gameid=lowrez-2022
-gametitle=LOWREZJAM 2022
+gameid=bat-out-of-heck
+gametitle=Bat out of Heck
 version=0.1
 icon=metadata/icon.png

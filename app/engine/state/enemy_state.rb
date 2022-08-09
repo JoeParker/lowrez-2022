@@ -79,7 +79,7 @@ def drop_tanks args
       tank.angle -= 5
       # Despawn tanks at the ground
       args.state.tanks.reject! do |tank|
-        tank.y < 0
+        draw_explosion args, tank.x, tank.y if tank.y < 0
       end
     end
   end

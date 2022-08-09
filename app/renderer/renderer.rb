@@ -278,6 +278,9 @@ def render_game args, lowrez_sprites
   args.state.power_ups ||= []
   lowrez_sprites << [args.state.power_ups]
 
+  args.state.explosions ||= []
+  lowrez_sprites << [args.state.explosions]
+
   return_to_menu args if args.keyboard.key_down.escape
 end
 
@@ -387,6 +390,32 @@ def animate_tank_bullets args
 
   args.state.tank_bullets.each do |bullet|
     bullet.tile_x = rand(3) # The flame animated is simply randomised, no need to go sequentially
+  end
+end
+
+def draw_explosion args, x, y
+  args.state.explosions << {
+    x:     x,
+    y:     y,
+    w:     8, h: 8,
+    path:  'assets/sprites/explosion.png',
+    tile_x: 0, tile_y: 0,
+    tile_w: 8, tile_h: 8
+  }
+  args.outputs.sounds << "assets/audio/sfx/power-up-hit.wav" # TODO explosion sfx?
+end
+
+def animate_explosions args
+  # Animate ~8 times per second
+  return unless args.state.tick_count % 8 == 0
+
+  args.state.explosions.each do |explosion|
+    explosion.tile_x += 8 # Move to the next frame in the spritesheet
+  end
+
+  # Discard completed explosions
+  args.state.explosions.reject! do |explosion|
+    explosion.tile_x > 24
   end
 end
 

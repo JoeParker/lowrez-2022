@@ -27,8 +27,8 @@ def destroy_power_ups args
         # Check if power-up and bullet are within 4 pixels of each other (i.e. overlapping)
         if 16 > (power_up.x - bullet.x) ** 2 + (power_up.y - bullet.y) ** 2
           # Power-up was shot down. Destroy it (TODO: animation)
-          args.outputs.sounds << "assets/audio/sfx/power-up-hit.wav"
-          true
+          draw_explosion args, power_up.x, power_up.y - 2
+          #true
         end
       end
     end
