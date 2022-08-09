@@ -26,10 +26,12 @@ def kill_enemies args
     if 9 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
       # Enemy is touching player. Kill enemy, and reduce player HP by 1.
       damage_player args
+      draw_explosion args, enemy.x, enemy.y # TODO add screen shake or red flash 
     else
       args.state.player_bullets.any? do |bullet|
         # Check if enemy and bullet are within 2 pixels of each other (i.e. overlapping)
         if 4 > (enemy.x - bullet.x) ** 2 + (enemy.y - bullet.y) ** 2
+          draw_explosion args, enemy.x, enemy.y, 0.5
 
           # If lifesteal power-up is active, restore player health by one for each enemy killed by a bullet after the first enemy, up to a maximum of 5 HP
           args.state.player[:health] += 1 if args.state.player[:active_power_up] == :lifesteal && args.state.player[:health] < 5 && bullet[:kills] > 0

@@ -393,11 +393,11 @@ def animate_tank_bullets args
   end
 end
 
-def draw_explosion args, x, y
+def draw_explosion args, x, y, scale = 1
   args.state.explosions << {
     x:     x,
     y:     y,
-    w:     8, h: 8,
+    w:     8 * scale, h: 8 * scale,
     path:  'assets/sprites/explosion.png',
     tile_x: 0, tile_y: 0,
     tile_w: 8, tile_h: 8

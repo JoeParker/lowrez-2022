@@ -26,9 +26,8 @@ def destroy_power_ups args
       args.state.player_bullets.any? do |bullet|
         # Check if power-up and bullet are within 4 pixels of each other (i.e. overlapping)
         if 16 > (power_up.x - bullet.x) ** 2 + (power_up.y - bullet.y) ** 2
-          # Power-up was shot down. Destroy it (TODO: animation)
+          # Power-up was shot down. Destroy it
           draw_explosion args, power_up.x, power_up.y - 2
-          #true
         end
       end
     end
