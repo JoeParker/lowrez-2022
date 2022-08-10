@@ -38,6 +38,7 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     fire_player args
     grab_attack_player args
     drop_attack_player args
+    animate_player_hit args
 
     # Enemy physics
     spawn_enemies args

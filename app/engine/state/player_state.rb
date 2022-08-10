@@ -121,3 +121,8 @@ def drop_attack_player args
       end
   end
 end
+
+def player_is_invulnerable args
+  # Player is invulnerable for 1 second after being hit
+  args.state.player[:last_hit_at] + 60 >= args.state.tick_count
+end

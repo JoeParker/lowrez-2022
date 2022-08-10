@@ -19,6 +19,7 @@ def initialise_player args
         y: SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2, 
         w: PLAYER_WIDTH, 
         h: PLAYER_WIDTH, 
+        a: 255,
         vx: 0, vy: 0, 
         direction: 1,
         path: "assets/sprites/player-fly.png",
@@ -28,7 +29,8 @@ def initialise_player args
         cooldown: 0, 
         score: 0,
         active_power_up: nil,
-        grabbing: false
+        grabbing: false,
+        last_hit_at: -Float::INFINITY
       }
   end
 end
@@ -139,7 +141,7 @@ end
 def animate_game_over_text args, lowrez_labels, time_elapsed
   # Determine the player's rank
   case args.state.player.score
-  when -(1.0 / 0)..-1
+  when -Float::INFINITY..-1
     rank = "How?"
   when 0
     rank = "Umm.."
@@ -193,6 +195,7 @@ def reset_game player, args
   args.state.tanks.clear
   args.state.tank_bullets.clear
   args.state.power_ups.clear
+  args.state.explosions.clear
 
   args.outputs.sounds << "assets/audio/music/game.ogg" unless args.state.scene == :controls
   change_to_scene args, :game 
@@ -393,6 +396,24 @@ def animate_tank_bullets args
   end
 end
 
+def animate_player_hit args
+  if player_is_invulnerable args
+    # # Animate 6 times per second
+    return unless args.state.tick_count % 10 == 0
+    case args.state.player[:a]
+    when 255
+      args.state.player.a = 140
+    when 140
+      args.state.player.a = 70
+    when 70
+      args.state.player.a = 140
+    end
+  else
+    args.state.player.a = 255
+    args.state.player.last_hit_at = -Float::INFINITY
+  end
+end
+
 def draw_explosion args, x, y, scale = 1
   args.state.explosions << {
     x:     x,
@@ -470,6 +491,7 @@ def running_sprite args
     y: args.state.player.y,
     w: args.state.player.w,
     h: args.state.player.h,
+    a: args.state.player.a,
     path: 'assets/sprites/player-fly.png',
     tile_x: 0 + (tile_index * args.state.player.w),
     tile_y: 0,
