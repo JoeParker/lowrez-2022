@@ -126,7 +126,9 @@ end
 
 def player_is_invulnerable args
   # Player is invulnerable for 1 second after being hit
-  args.state.player[:last_hit_at] + 60 >= args.state.tick_count
+  (args.state.player[:last_hit_at] + 60 >= args.state.tick_count) ||
+  # or while the immunity power up is active
+  (args.state.player[:active_power_up] == :immunity)
 end
 
 def remaining_power_up_duration args

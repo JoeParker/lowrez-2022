@@ -68,7 +68,6 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
 
   enable_debug_controls args if DEV_MODE
 
-  # args.state.clear! 
   game_over args if args.state.player[:health] <= 0
 end
 
@@ -77,7 +76,9 @@ def game_over args
 end
 
 def enable_debug_controls args
+  # Scenes
   game_over args if args.keyboard.key_down.g
+  # Player state
   args.state.player.score += 10 if args.keyboard.key_down.plus
   args.state.player.score -= 10 if args.keyboard.key_down.hyphen
   args.state.player.health = 5 if args.keyboard.key_down.h
@@ -88,4 +89,5 @@ def enable_debug_controls args
   activate_power_up args, :slowdown if args.keyboard.key_down.three
   activate_power_up args, :rapid_fire if args.keyboard.key_down.four
   activate_power_up args, :minigun if args.keyboard.key_down.five
+  activate_power_up args, :immunity if args.keyboard.key_down.six
 end

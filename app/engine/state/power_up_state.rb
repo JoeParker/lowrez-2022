@@ -55,6 +55,9 @@ def activate_power_up args, effect
   when :minigun
     args.state.player.power_up_active_at = args.state.tick_count
     args.state.player.active_power_up = :minigun
+  when :immunity
+    args.state.player.power_up_active_at = args.state.tick_count
+    args.state.player.active_power_up = :immunity
   else
     # Undefined power up effect type
   end
