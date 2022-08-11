@@ -319,8 +319,8 @@ def spawn_enemies args
 end
 
 def spawn_tanks args
-  # Limit to max 1 tank on screen at once per 100 points scored
-  tank_limit = args.state.player.score / 100
+  # Limit to max 1 tank on screen at once, or 2 if over 100 points scored
+  tank_limit = args.state.player.score >= 100 ? 2 : 1
   # And dont spawn tanks until score is at least 20
   return unless (args.state.tanks.length < tank_limit && args.state.player[:score] >= 20) || (args.keyboard.key_down.t && DEV_MODE)
 
