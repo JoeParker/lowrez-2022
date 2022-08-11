@@ -49,6 +49,12 @@ def activate_power_up args, effect
   when :slowdown
     args.state.player.power_up_active_at = args.state.tick_count
     args.state.player.active_power_up = :slowdown
+  when :rapid_fire
+    args.state.player.power_up_active_at = args.state.tick_count
+    args.state.player.active_power_up = :rapid_fire
+  when :minigun
+    args.state.player.power_up_active_at = args.state.tick_count
+    args.state.player.active_power_up = :minigun
   else
     # Undefined power up effect type
   end

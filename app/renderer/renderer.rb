@@ -465,7 +465,16 @@ def fire_player args
         kills: 0
     }
     args.outputs.sounds << "assets/audio/sfx/player-fire.wav"
-    args.state.player[:cooldown] = 30 # Reset the cooldown
+    # Reset the cooldown
+    case args.state.player[:active_power_up]
+    when :rapid_fire
+      cooldown = 0
+    when :minigun
+      cooldown = 18
+    else
+      cooldown = 30
+    end 
+    args.state.player[:cooldown] = cooldown
   end
 end
 

@@ -73,17 +73,18 @@ end
 
 # Custom function for getting a directional vector just for shooting
 def shoot_directional_vector args
-    # Abandoned 4d shooting in favour of shooting based on player direction
     dx = 0
-    # dx += 0.1 if args.inputs.keyboard.key_down.right || args.inputs.keyboard.key_held.right
-    # dx -= 0.1 if args.inputs.keyboard.key_down.left || args.inputs.keyboard.key_held.left
     dy = 0
-    # dy += 0.1 if args.inputs.keyboard.key_down.up || args.inputs.keyboard.key_held.up
-    # dy -= 0.1 if args.inputs.keyboard.key_down.down || args.inputs.keyboard.key_held.down
-  
-    dx += PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction < 0
-    dx -= PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction > 0
-  
+
+    # Minigun power-up allows player to shoot by holding space
+    if args.state.player[:active_power_up] == :minigun
+      dx += PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_held.space && args.state.player.direction < 0
+      dx -= PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_held.space && args.state.player.direction > 0
+    else
+      dx += PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction < 0
+      dx -= PLAYER_PROJECTILE_SPEED if args.inputs.keyboard.key_down.space && args.state.player.direction > 0
+    end
+
     if dx != 0 && dy != 0
       dx *= 0.7071
       dy *= 0.7071

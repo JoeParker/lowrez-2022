@@ -86,4 +86,6 @@ def enable_debug_controls args
   activate_power_up args, :lifesteal if args.keyboard.key_down.one
   activate_power_up args, :speed if args.keyboard.key_down.two
   activate_power_up args, :slowdown if args.keyboard.key_down.three
+  activate_power_up args, :rapid_fire if args.keyboard.key_down.four
+  activate_power_up args, :minigun if args.keyboard.key_down.five
 end
