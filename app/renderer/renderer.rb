@@ -322,10 +322,10 @@ def spawn_tanks args
   # Limit to max 1 tank on screen at once per 100 points scored
   tank_limit = args.state.player.score / 100
   # And dont spawn tanks until score is at least 20
-  return unless (args.state.tanks.length < tank_limit && args.state.player[:score] >= 20) || args.keyboard.key_down.t # DEBUG
+  return unless (args.state.tanks.length < tank_limit && args.state.player[:score] >= 20) || (args.keyboard.key_down.t && DEV_MODE)
 
   # Spawn enemies more frequently as the player's score increases.
-  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || args.keyboard.key_down.t # DEBUG
+  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.t && DEV_MODE)
 
     # Spawn from bottom left/right only
     case rand(2)
@@ -346,7 +346,7 @@ end
 
 def spawn_power_ups args
   # Power-up spawns once every 10 seconds
-  if (args.state.tick_count % 600 == 0) || args.keyboard.key_down.p # DEBUG
+  if (args.state.tick_count % 600 == 0) || (args.keyboard.key_down.p && DEV_MODE)
 
     # Determine a random power-up type
     # Health drops are the most common

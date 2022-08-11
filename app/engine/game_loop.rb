@@ -66,7 +66,7 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     render_game_over args, lowrez_labels
   end
 
-  enable_debug_controls args
+  enable_debug_controls args if DEV_MODE
 
   # args.state.clear! 
   game_over args if args.state.player[:health] <= 0
@@ -78,4 +78,7 @@ end
 
 def enable_debug_controls args
   game_over args if args.keyboard.key_down.g
+  args.state.player.score += 10 if args.keyboard.key_down.plus
+  args.state.player.score -= 10 if args.keyboard.key_down.hyphen
+  args.state.player.health = 5 if args.keyboard.key_down.h
 end
