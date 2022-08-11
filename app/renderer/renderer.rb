@@ -512,18 +512,18 @@ def animate_power_up_bar args
   time_remaining = remaining_power_up_duration args
   current_width = time_remaining / 25
   if time_remaining > 0
-    if args.state.active_orb == [] && args.state.active_bar == []
-      args.state.active_orb << {
+    if (args.state.active_orb == [] && args.state.active_bar == []) || args.state.active_orb[0].path != "assets/sprites/orb-#{args.state.player[:active_power_up]}.png"
+      args.state.active_orb = [{
         x: 60, y: 54,
         w: 4, h: 4,
         path: "assets/sprites/orb-#{args.state.player[:active_power_up]}.png",
         angle: 180
-      }
-      args.state.active_bar << {
+      }]
+      args.state.active_bar = [{
         x: 60 - current_width, y: 55,
         w: current_width, h: 2,
         path: "assets/sprites/bar-#{args.state.player[:active_power_up]}.png"
-      }
+      }]
     else 
       args.state.active_bar[0].x = 60 - current_width
       args.state.active_bar[0].w = current_width
