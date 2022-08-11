@@ -58,6 +58,7 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     spawn_power_ups args
     move_power_ups args
     destroy_power_ups args
+    animate_power_up_bar args
 
     # Effects
     animate_explosions args

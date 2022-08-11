@@ -38,8 +38,9 @@ def activate_power_up args, effect
   case effect
   when :health
     args.state.player.health += 1
-    args.state.player.health = args.state.player.health.clamp(0, 5)# = 5 if args.state.player[:health] > 5
+    args.state.player.health = args.state.player.health.clamp(0, 5)
   when :lifesteal
+    args.state.player.power_up_active_at = args.state.tick_count
     args.state.player.active_power_up = :lifesteal
   else
     # Undefined power up effect type

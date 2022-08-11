@@ -78,7 +78,7 @@ end
 
 def drop_tanks args
   args.state.tanks.each do |tank|
-    if tank.grab_state == :falling && tank.y >= 0
+    if tank.grab_state == :falling
       tank.y -= 0.4
       tank.x += args.state.player_dropped_vx
       tank.angle -= 5

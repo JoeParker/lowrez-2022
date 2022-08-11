@@ -30,7 +30,8 @@ def initialise_player args
         score: 0,
         active_power_up: nil,
         grabbing: false,
-        last_hit_at: -Float::INFINITY
+        last_hit_at: -Float::INFINITY,
+        power_up_active_at: -Float::INFINITY
       }
   end
 end
@@ -284,6 +285,12 @@ def render_game args, lowrez_sprites
   args.state.explosions ||= []
   lowrez_sprites << [args.state.explosions]
 
+  args.state.active_orb ||= []
+  lowrez_sprites << [args.state.active_orb]
+
+  args.state.active_bar ||= []
+  lowrez_sprites << [args.state.active_bar]
+
   return_to_menu args if args.keyboard.key_down.escape
 end
 
@@ -499,4 +506,32 @@ def running_sprite args
     tile_h: args.state.player.h,
     flip_horizontally: args.state.player.direction > 0,
   }
+end
+
+def animate_power_up_bar args
+  time_remaining = remaining_power_up_duration args
+  current_width = time_remaining / 25
+  if time_remaining > 0
+    if args.state.active_orb == [] && args.state.active_bar == []
+      args.state.active_orb << {
+        x: 60, y: 54,
+        w: 4, h: 4,
+        path: "assets/sprites/orb-#{args.state.player[:active_power_up]}.png",
+        angle: 180
+      }
+      args.state.active_bar << {
+        x: 60 - current_width, y: 55,
+        w: current_width, h: 2,
+        path: "assets/sprites/bar-#{args.state.player[:active_power_up]}.png"
+      }
+    else 
+      args.state.active_bar[0].x = 60 - current_width
+      args.state.active_bar[0].w = current_width
+    end
+  else
+    args.state.active_bar.clear
+    args.state.active_orb.clear
+    args.state.player.power_up_active_at = -Float::INFINITY
+    args.state.player.active_power_up = nil
+  end
 end
