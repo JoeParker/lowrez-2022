@@ -34,6 +34,7 @@ def destroy_power_ups args
   end
 end
 
+# TODO group the ones that active up for 5 secs under one case
 def activate_power_up args, effect
   case effect
   when :health
@@ -42,6 +43,12 @@ def activate_power_up args, effect
   when :lifesteal
     args.state.player.power_up_active_at = args.state.tick_count
     args.state.player.active_power_up = :lifesteal
+  when :speed
+    args.state.player.power_up_active_at = args.state.tick_count
+    args.state.player.active_power_up = :speed
+  when :slowdown
+    args.state.player.power_up_active_at = args.state.tick_count
+    args.state.player.active_power_up = :slowdown
   else
     # Undefined power up effect type
   end

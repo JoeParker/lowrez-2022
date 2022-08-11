@@ -12,8 +12,9 @@ def move_enemies args
     # Convert the angle to a vector pointing at the player
     dx, dy = theta.to_degrees.vector 5
     # Move the enemy towards the player
-    enemy.x -= dx * ENEMY_PROJECTILE_SPEED
-    enemy.y -= dy * ENEMY_PROJECTILE_SPEED
+    adjusted_speed = ENEMY_PROJECTILE_SPEED * (args.state.player[:active_power_up] == :slowdown ? 0.5 : 1)
+    enemy.x -= dx * adjusted_speed
+    enemy.y -= dy * adjusted_speed
 
     # Adjust the angle that the missile sprite should aim at the player
     enemy.angle = theta.to_degrees + 90

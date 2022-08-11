@@ -81,4 +81,9 @@ def enable_debug_controls args
   args.state.player.score += 10 if args.keyboard.key_down.plus
   args.state.player.score -= 10 if args.keyboard.key_down.hyphen
   args.state.player.health = 5 if args.keyboard.key_down.h
+  # Power ups
+  activate_power_up args, :health if args.keyboard.key_down.zero
+  activate_power_up args, :lifesteal if args.keyboard.key_down.one
+  activate_power_up args, :speed if args.keyboard.key_down.two
+  activate_power_up args, :slowdown if args.keyboard.key_down.three
 end
