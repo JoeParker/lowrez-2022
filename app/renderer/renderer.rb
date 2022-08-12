@@ -339,7 +339,8 @@ def spawn_tanks args
       x: x, y: 0,
       w: 7, h: 7,
       path: "assets/sprites/enemy-tank.png",
-      grab_state: nil
+      grab_state: nil,
+      angle: 0
     }
   end
 end
@@ -350,11 +351,21 @@ def spawn_power_ups args
 
     # Determine a random power-up type
     # Health drops are the most common
-    case rand(4)
+    case rand(9)
     when 0..2
       effect = :health
     when 3
       effect = :lifesteal
+    when 4
+      effect = :speed
+    when 5
+      effect = :slowdown
+    when 6
+      effect = :rapid_fire
+    when 7
+      effect = :minigun
+    when 8
+      effect = :immunity
     end
 
     # Spawn from above only, and within screen x bounds
