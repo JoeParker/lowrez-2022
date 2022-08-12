@@ -23,7 +23,7 @@ end
 
 # Custom function for getting a directional vector just for movement using WASD
 def move_directional_vector args
-  adjusted_speed = PLAYER_MOVE_SPEED * (args.state.player[:active_power_up] == :speed ? 1.5 : 1)
+  adjusted_speed = PLAYER_MOVE_SPEED * (args.state.player[:active_power_up] == :speed ? 1.4 : 1)
   dx = 0
   if args.inputs.keyboard.d
     dx += adjusted_speed 
