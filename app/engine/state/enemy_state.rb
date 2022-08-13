@@ -138,3 +138,27 @@ def move_helos args
     end
   end
 end
+
+def move_helo_bullets args
+  args.state.helo_bullets.each do |bullet|
+    # Move the bullets according to the bullet's velocity
+    bullet.x += (bullet.angle < 0 ? 0.2 : -0.2) # Direction depends on helo direction
+  end
+  args.state.helo_bullets.reject! do |bullet|
+    # Despawn bullets that are outside the screen area
+    bullet.x < 0 || bullet.y < 0 || bullet.x > 70 || bullet.y > 70
+  end
+end
+
+def destroy_helo_bullets args 
+  args.state.helo_bullets.reject! do |enemy|
+    # Check if bullet and player are within 4 pixels of each other (i.e. overlapping)
+    if 16 > (enemy.x - args.state.player.x) ** 2 + (enemy.y - args.state.player.y) ** 2
+      # Bullet is touching player. Destroy bullet, and reduce player HP by 1.
+      unless player_is_invulnerable args 
+        damage_player args
+        draw_explosion args, enemy.x, enemy.y
+      end
+    end
+  end
+end

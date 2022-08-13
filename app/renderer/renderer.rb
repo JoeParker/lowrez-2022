@@ -73,6 +73,9 @@ def render_game args, lowrez_sprites
   args.state.helos ||= []
   lowrez_sprites << [args.state.helos]
 
+  args.state.helo_bullets ||= []
+  lowrez_sprites << [args.state.helo_bullets]
+
   args.state.power_ups ||= []
   lowrez_sprites << [args.state.power_ups]
 
@@ -249,6 +252,8 @@ def reset_game player, args
   args.state.tank_bullets.clear
   args.state.power_ups.clear
   args.state.explosions.clear
+  args.state.helos.clear
+  args.state.helo_bullets.clear
 
   args.outputs.sounds << "assets/audio/music/game.ogg" unless args.state.scene == :controls
   change_to_scene args, :game 
@@ -375,7 +380,8 @@ def spawn_helos args
       tile_w: 8, tile_h: 5,
       tile_index: 0,
       flip_horizontally: flip_horizontally,
-      angle: 0
+      angle: 0,
+      grab_state: nil
     }
   end
 end
@@ -453,12 +459,44 @@ def fire_tank args
   end
 end
 
+def fire_helo args
+  args.state.helos.each do |helo|
+    # Grabbed and falling helos cannot fire
+    return unless helo.grab_state == nil
+
+    # Shoot once every 3 seconds, after moving fully onto the screen
+    if args.state.tick_count % 180 == 0 && helo.x >= 0 && helo.x <= 59
+      # Add a new bullet to the list of tank bullets.
+      facing_left = helo.flip_horizontally
+      args.state.helo_bullets << {
+        x:     facing_left ? helo.x : helo.x + 8,
+        y:     helo.y,
+        w:     1, h: 3,
+        path:  'assets/sprites/tank-bullet.png', # TODO helo missile
+        tile_x: 0, tile_y: 0,
+        tile_w: 1, tile_h: 3,
+        angle: facing_left ? 90 : -90
+      }
+      args.outputs.sounds << "assets/audio/sfx/tank-fire.wav"
+    end
+  end
+end
+
 def animate_tank_bullets args
   # Animate 6 times per second
   return unless args.state.tick_count % 10 == 0
 
   args.state.tank_bullets.each do |bullet|
-    bullet.tile_x = rand(3) # The flame animated is simply randomised, no need to go sequentially
+    bullet.tile_x = rand(3) # The flame animation is simply randomised, no need to go sequentially
+  end
+end
+
+def animate_helo_bullets args
+  # Animate 6 times per second
+  return unless args.state.tick_count % 10 == 0
+
+  args.state.helo_bullets.each do |bullet|
+    bullet.tile_x = rand(3) # The flame animation is simply randomised, no need to go sequentially
   end
 end
 
