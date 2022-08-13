@@ -296,8 +296,11 @@ def calculate_enemy_spawn_point
 end
 
 def spawn_enemies args
-  # Spawn enemies more frequently as the player's score increases.
-  if rand < (75+args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
+  # Limit to a maximum of 10 enemy missiles on screen at once
+  return unless args.state.enemies.length < 10
+
+  # Spawn enemies more frequently as the player's score increases
+  if rand < (75 + args.state.player[:score])/(10000 + args.state.player[:score]) || args.state.tick_count.zero?
     x, y = calculate_enemy_spawn_point
     args.state.enemies << {
       x: x, y: y,
@@ -315,7 +318,7 @@ def spawn_tanks args
   return unless (args.state.tanks.length < tank_limit && args.state.player[:score] >= 20) || (args.keyboard.key_down.t && DEV_MODE)
 
   # Spawn enemies more frequently as the player's score increases.
-  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.t && DEV_MODE)
+  if rand < (75 + args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.t && DEV_MODE)
 
     # Spawn from bottom left/right only
     case rand(2)
@@ -342,7 +345,7 @@ def spawn_helos args
   return unless (args.state.helos.length < helo_limit && args.state.player[:score] >= 70) || (args.keyboard.key_down.h && DEV_MODE)
 
   # Spawn enemies more frequently as the player's score increases.
-  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.h && DEV_MODE)
+  if rand < (75 + args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.h && DEV_MODE)
 
     # Spawn from left/right only
     case rand(2)
@@ -376,7 +379,7 @@ def spawn_bombers args
   return unless (args.state.bombers.length < bomber_limit && args.state.player[:score] >= 150) || (args.keyboard.key_down.b && DEV_MODE)
 
   # Spawn enemies more frequently as the player's score increases.
-  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.b && DEV_MODE)
+  if rand < (75 + args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.b && DEV_MODE)
 
     # Spawn from left/right only
     case rand(2)
