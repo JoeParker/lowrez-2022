@@ -2,5 +2,5 @@ devid=joeparker
 devtitle=Joe Parker
 gameid=bat-out-of-heck
 gametitle=Bat out of Heck
-version=0.1
+version=1.0
 icon=metadata/icon.png
