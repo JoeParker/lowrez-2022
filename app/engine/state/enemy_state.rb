@@ -4,6 +4,7 @@
 
 ENEMY_PROJECTILE_SPEED = 0.06
 ENEMY_TANK_SPEED = 0.06
+ENEMY_HELO_SPEED = 0.06
 
 def move_enemies args
   args.state.enemies.each do |enemy|
@@ -119,4 +120,21 @@ def damage_player args
   args.state.player[:health] -= 1
   args.state.player[:last_hit_at] = args.state.tick_count
   args.outputs.sounds << "assets/audio/sfx/player-hit.wav"
+end
+
+def move_helos args
+  args.state.helos.each do |helo|
+    # First, move the helo onto the screen
+    helo.x += 0.1 if helo.x < 1
+    helo.x -= 0.1 if helo.x > 55
+
+    # Is the player above or below the helo?
+    move_down = args.state.player[:y] < helo[:y]
+    # Move the tank towards the player
+    if move_down
+      helo.y -= ENEMY_HELO_SPEED
+    else
+      helo.y += ENEMY_HELO_SPEED
+    end
+  end
 end

@@ -1,6 +1,5 @@
 ###################################################################################
-# MAIN GAME LOOP
-# RUNS 60 TIMES PER SECOND
+# MAIN GAME LOOP & SCENE MANAGER
 ###################################################################################
 
 require 'app/renderer/renderer.rb'
@@ -53,6 +52,10 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     destroy_tank_bullets args
     carry_tanks args
     drop_tanks args
+
+    spawn_helos args
+    move_helos args
+    animate_helos args
 
     # Power ups
     spawn_power_ups args

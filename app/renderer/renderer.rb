@@ -36,6 +36,58 @@ def initialise_player args
   end
 end
 
+
+def render_game args, lowrez_sprites
+  args.state.show_gridlines = DISPLAY_GRID
+
+  args.state.background ||= {
+    x: 0, y: 0,
+    w: SCREEN_WIDTH, h: SCREEN_WIDTH,
+    path: "assets/scenes/game.png"
+  }
+  lowrez_sprites << [args.state.background]
+
+  args.state.healthbar ||= []
+  lowrez_sprites << [args.state.healthbar]
+
+  draw_health args
+
+  args.state.player_bullets ||= []
+  lowrez_sprites << [args.state.player_bullets]
+
+  args.state.enemies ||= []
+  lowrez_sprites << [args.state.enemies]
+
+  # if args.state.player.started_moving_at
+    lowrez_sprites << [running_sprite(args)]
+  # else
+    # lowrez_sprites << [idle_sprite(args)]
+  # end
+
+  args.state.tanks ||= []
+  lowrez_sprites << [args.state.tanks]
+
+  args.state.tank_bullets ||= []
+  lowrez_sprites << [args.state.tank_bullets]
+
+  args.state.helos ||= []
+  lowrez_sprites << [args.state.helos]
+
+  args.state.power_ups ||= []
+  lowrez_sprites << [args.state.power_ups]
+
+  args.state.explosions ||= []
+  lowrez_sprites << [args.state.explosions]
+
+  args.state.active_orb ||= []
+  lowrez_sprites << [args.state.active_orb]
+
+  args.state.active_bar ||= []
+  lowrez_sprites << [args.state.active_bar]
+
+  return_to_menu args if args.keyboard.key_down.escape
+end
+
 def animate_player_death player, time_elapsed
   # player.angle -= 1 # TODO: Why doesn't this work?
 
@@ -246,54 +298,6 @@ def draw_health args
   
 end
 
-def render_game args, lowrez_sprites
-  args.state.show_gridlines = DISPLAY_GRID
-
-  args.state.background ||= {
-    x: 0, y: 0,
-    w: SCREEN_WIDTH, h: SCREEN_WIDTH,
-    path: "assets/scenes/game.png"
-  }
-  lowrez_sprites << [args.state.background]
-
-  args.state.healthbar ||= []
-  lowrez_sprites << [args.state.healthbar]
-
-  draw_health args
-
-  args.state.player_bullets ||= []
-  lowrez_sprites << [args.state.player_bullets]
-
-  args.state.enemies ||= []
-  lowrez_sprites << [args.state.enemies]
-
-  # if args.state.player.started_moving_at
-    lowrez_sprites << [running_sprite(args)]
-  # else
-    # lowrez_sprites << [idle_sprite(args)]
-  # end
-
-  args.state.tanks ||= []
-  lowrez_sprites << [args.state.tanks]
-
-  args.state.tank_bullets ||= []
-  lowrez_sprites << [args.state.tank_bullets]
-
-  args.state.power_ups ||= []
-  lowrez_sprites << [args.state.power_ups]
-
-  args.state.explosions ||= []
-  lowrez_sprites << [args.state.explosions]
-
-  args.state.active_orb ||= []
-  lowrez_sprites << [args.state.active_orb]
-
-  args.state.active_bar ||= []
-  lowrez_sprites << [args.state.active_bar]
-
-  return_to_menu args if args.keyboard.key_down.escape
-end
-
 def calculate_enemy_spawn_point
   case rand(3)
   when 0 # Spawn from left
@@ -342,6 +346,50 @@ def spawn_tanks args
       grab_state: nil,
       angle: 0
     }
+  end
+end
+
+def spawn_helos args
+  # Limit to max 1 helo on screen at once, or 2 if over 100 points scored
+  helo_limit = args.state.player.score >= 100 ? 2 : 1
+  # And dont spawn helos until score is at least 20
+  return unless (args.state.helos.length < helo_limit && args.state.player[:score] >= 20) || (args.keyboard.key_down.h && DEV_MODE)
+
+  # Spawn enemies more frequently as the player's score increases.
+  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.h && DEV_MODE)
+
+    # Spawn from left/right only
+    # TODO: only spawn one on each side
+    case rand(2)
+    when 0 # Spawn from left
+      x, flip_horizontally = [-5, false]
+    when 1 # Spawn from right
+      x, flip_horizontally = [70, true]
+    end
+
+    args.state.helos << {
+      x: x, y: rand(50) + 10,
+      w: 8, h: 5,
+      path: "assets/sprites/enemy-helo-animated.png",
+      tile_x: 0, tile_y: 0,
+      tile_w: 8, tile_h: 5,
+      tile_index: 0,
+      flip_horizontally: flip_horizontally,
+      angle: 0
+    }
+  end
+end
+
+def animate_helos args
+  # Animate 12 times per second
+  return unless args.state.tick_count % 5 == 0
+
+  args.state.helos.each do |helo|
+    if helo.tile_x < 24
+      helo.tile_x += 8
+    else
+      helo.tile_x = 0
+    end
   end
 end
 
