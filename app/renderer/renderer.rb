@@ -76,6 +76,9 @@ def render_game args, lowrez_sprites
   args.state.helo_bullets ||= []
   lowrez_sprites << [args.state.helo_bullets]
 
+  args.state.bombers ||= []
+  lowrez_sprites << [args.state.bombers]
+
   args.state.power_ups ||= []
   lowrez_sprites << [args.state.power_ups]
 
@@ -348,13 +351,42 @@ def spawn_helos args
     args.state.helos << {
       x: x, y: rand(50) + 10,
       w: 8, h: 5,
-      path: "assets/sprites/enemy-helo-animated.png",
+      path: "assets/sprites/enemy-helo.png",
       tile_x: 0, tile_y: 0,
       tile_w: 8, tile_h: 5,
       tile_index: 0,
       flip_horizontally: flip_horizontally,
       angle: 0,
       grab_state: nil
+    }
+  end
+end
+
+def spawn_bombers args
+  # Limit to max 1 bomber on screen at once
+  bomber_limit = 1
+  # And dont spawn bombers until score is at least 150
+  return unless (args.state.bombers.length < bomber_limit && args.state.player[:score] >= 150) || (args.keyboard.key_down.b && DEV_MODE)
+
+  # Spawn enemies more frequently as the player's score increases.
+  if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.b && DEV_MODE)
+
+    # Spawn from left/right only
+    case rand(2)
+    when 0 # Spawn from left
+      x, flip_horizontally = [-20, true]
+    when 1 # Spawn from right
+      x, flip_horizontally = [70, false]
+    end
+
+    args.state.bombers << {
+      x: x, y: rand(15) + 45,
+      w: 17, h: 6,
+      path: "assets/sprites/enemy-bomber.png",
+      tile_x: 0, tile_y: 0,
+      tile_w: 17, tile_h: 6,
+      tile_index: 0,
+      flip_horizontally: flip_horizontally
     }
   end
 end

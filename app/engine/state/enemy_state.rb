@@ -191,3 +191,14 @@ def drop_helos args
     end
   end
 end
+
+def move_bombers args
+  args.state.bombers.each do |bomber|
+    # Bombers move across the x axis in a single direction
+    bomber.x += bomber.flip_horizontally ? 0.5 : -0.5
+  end
+  args.state.bombers.reject! do |bomber|
+    # Remove bombers that have fully left the screen
+    bomber.x < -20 || bomber.x > 84
+  end
+end

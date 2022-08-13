@@ -63,6 +63,9 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     carry_helos args
     drop_helos args
 
+    spawn_bombers args
+    move_bombers args
+
     # Power ups
     spawn_power_ups args
     move_power_ups args
@@ -108,6 +111,7 @@ def reset_game player, args
   args.state.explosions.clear
   args.state.helos.clear
   args.state.helo_bullets.clear
+  args.state.bombers.clear
 
   args.outputs.sounds << "assets/audio/music/game.ogg" unless args.state.scene == :controls
   change_to_scene args, :game 
