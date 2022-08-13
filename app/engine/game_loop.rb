@@ -77,6 +77,9 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
 
     # Effects
     animate_explosions args
+
+    # Background
+    animate_background args
   when :game_over
     render_game_over args, lowrez_labels
   end
@@ -108,7 +111,7 @@ def reset_game player, args
   player.grabbing = false
   player.last_hit_at = -Float::INFINITY
   player.power_up_active_at = -Float::INFINITY
-  args.state.player.started_moving_at = 0
+  player.started_moving_at = 0
   args.state.player_bullets.clear
   args.state.enemies.clear
   args.state.tanks.clear

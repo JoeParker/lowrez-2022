@@ -40,10 +40,14 @@ end
 def render_game args, lowrez_sprites
   args.state.show_gridlines = DISPLAY_GRID
 
+  starting_background_animation_index = rand(30)
+  
   args.state.background ||= {
     x: 0, y: 0,
     w: SCREEN_WIDTH, h: SCREEN_WIDTH,
-    path: "assets/scenes/game.png"
+    path: "assets/scenes/game-#{starting_background_animation_index}.png",
+    animation_index: starting_background_animation_index,
+    reverse_animation: false
   }
   lowrez_sprites << [args.state.background]
 
@@ -671,4 +675,19 @@ def animate_power_up_bar args
     args.state.player.power_up_active_at = -Float::INFINITY
     args.state.player.active_power_up = nil
   end
+end
+
+def animate_background args
+  # Animate 6 times per second
+  return unless args.state.tick_count % 10 == 0 
+
+  args.state.background.reverse_animation = true if args.state.background.animation_index == 29
+  args.state.background.reverse_animation = false if args.state.background.animation_index == 0
+
+  if args.state.background.reverse_animation
+    args.state.background.animation_index -= 1
+  else
+    args.state.background.animation_index += 1
+  end
+  args.state.background.path = "assets/scenes/game-#{args.state.background.animation_index}.png"
 end
