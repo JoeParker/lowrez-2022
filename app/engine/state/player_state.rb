@@ -99,6 +99,7 @@ def grab_attack_player args
 
   # 1. Tanks
   args.state.tanks.each do |tank|
+    next unless tank.grab_state == nil
     # Check if player and tank are within 4 pixels of each other (i.e. overlapping)
     if 16 > (args.state.player.x - tank.x) ** 2 + (args.state.player.y - tank.y) ** 2
       args.state.player.grabbing = true
@@ -107,6 +108,7 @@ def grab_attack_player args
   end
   # 2. Helos
   args.state.helos.each do |helo|
+    next unless helo.grab_state == nil
     # Check if player and tank are within 4 pixels of each other (i.e. overlapping)
     if 16 > (args.state.player.x - helo.x) ** 2 + (args.state.player.y - helo.y) ** 2
       args.state.player.grabbing = true

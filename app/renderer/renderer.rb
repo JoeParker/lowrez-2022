@@ -230,35 +230,6 @@ def animate_game_over_text args, lowrez_labels, time_elapsed
   lowrez_labels << { x: 15, y: 6, text: "[Enter]", r: 233, g: 236, b: 232} if time_elapsed >= 200 
 end
 
-def return_to_menu args
-  reset_game args.state.player, args
-  change_to_scene args, :menu 
-end
-
-def reset_game player, args
-  player.health = 5
-  player.score = 0
-  player.x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
-  player.y = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
-  player.vx = 0
-  player.vy = 0
-  player.direction = 1
-  player.active_power_up = nil
-  player.time_of_death = nil
-  args.state.player.started_moving_at = 0
-  args.state.player_bullets.clear
-  args.state.enemies.clear
-  args.state.tanks.clear
-  args.state.tank_bullets.clear
-  args.state.power_ups.clear
-  args.state.explosions.clear
-  args.state.helos.clear
-  args.state.helo_bullets.clear
-
-  args.outputs.sounds << "assets/audio/music/game.ogg" unless args.state.scene == :controls
-  change_to_scene args, :game 
-end
-
 def change_to_scene args, scene
     args.state.scene = scene
     args.state.scene_at = args.state.tick_count

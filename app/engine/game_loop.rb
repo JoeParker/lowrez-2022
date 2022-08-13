@@ -84,6 +84,37 @@ def game_over args
   change_to_scene args, :game_over 
 end
 
+def return_to_menu args
+  reset_game args.state.player, args
+  change_to_scene args, :menu 
+end
+
+def reset_game player, args
+  player.health = 5
+  player.score = 0
+  player.x = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
+  player.y = SCREEN_WIDTH / 2 - PLAYER_WIDTH / 2
+  player.vx = 0
+  player.vy = 0
+  player.direction = 1
+  player.active_power_up = nil
+  player.time_of_death = nil
+  args.state.player.started_moving_at = 0
+  args.state.player_bullets.clear
+  args.state.enemies.clear
+  args.state.tanks.clear
+  args.state.tank_bullets.clear
+  args.state.power_ups.clear
+  args.state.explosions.clear
+  args.state.helos.clear
+  args.state.helo_bullets.clear
+
+  args.outputs.sounds << "assets/audio/music/game.ogg" unless args.state.scene == :controls
+  change_to_scene args, :game 
+end
+
+# Devtools
+
 def enable_debug_controls args
   # Scenes
   game_over args if args.keyboard.key_down.g
