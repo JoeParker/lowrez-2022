@@ -86,7 +86,10 @@ def drop_tanks args
       tank.angle -= 5
       # Despawn tanks at the ground
       args.state.tanks.reject! do |tank|
-        draw_explosion args, tank.x, tank.y - 3 if tank.y < 0
+        if tank.y < 0
+          draw_explosion args, tank.x, tank.y - 3
+          args.state.player.score += 10
+        end
       end
     end
   end
@@ -186,7 +189,10 @@ def drop_helos args
       helo.angle -= 5
       # Despawn helos at the ground
       args.state.helos.reject! do |helo|
-        draw_explosion args, helo.x, helo.y - 3 if helo.y < 0
+        if helo.y < 0
+          draw_explosion args, helo.x, helo.y - 3
+          args.state.player.score += 10
+        end
       end
     end
   end
