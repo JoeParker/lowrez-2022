@@ -105,6 +105,9 @@ def reset_game player, args
   player.direction = 1
   player.active_power_up = nil
   player.time_of_death = nil
+  player.grabbing = false
+  player.last_hit_at = -Float::INFINITY
+  player.power_up_active_at = -Float::INFINITY
   args.state.player.started_moving_at = 0
   args.state.player_bullets.clear
   args.state.enemies.clear

@@ -410,8 +410,8 @@ def animate_helos args
 end
 
 def spawn_power_ups args
-  # Power-up spawns once every 15 seconds
-  if (args.state.tick_count % 900 == 0) || (args.keyboard.key_down.p && DEV_MODE)
+  # Power-up spawns once every 15 seconds, after reaching at least 5 score
+  if (args.state.tick_count % 900 == 0 && args.state.player.score >= 5) || (args.keyboard.key_down.p && DEV_MODE)
 
     # Determine a random power-up type
     # Health drops are the most common
