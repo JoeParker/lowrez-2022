@@ -44,31 +44,13 @@ def destroy_power_ups args
   end
 end
 
-# TODO group the ones that are active for 5 secs under one case
 def activate_power_up args, effect
-  case effect
-  when :health
+  # Health power ups activate immediately, others are active for 10 seconds
+  if effect == :health
     args.state.player.health += 1
     args.state.player.health = args.state.player.health.clamp(0, 5)
-  when :lifesteal
+  else 
     args.state.player.power_up_active_at = args.state.tick_count
-    args.state.player.active_power_up = :lifesteal
-  when :speed
-    args.state.player.power_up_active_at = args.state.tick_count
-    args.state.player.active_power_up = :speed
-  when :slowdown
-    args.state.player.power_up_active_at = args.state.tick_count
-    args.state.player.active_power_up = :slowdown
-  when :rapid_fire
-    args.state.player.power_up_active_at = args.state.tick_count
-    args.state.player.active_power_up = :rapid_fire
-  when :minigun
-    args.state.player.power_up_active_at = args.state.tick_count
-    args.state.player.active_power_up = :minigun
-  when :immunity
-    args.state.player.power_up_active_at = args.state.tick_count
-    args.state.player.active_power_up = :immunity
-  else
-    # Undefined power up effect type
+    args.state.player.active_power_up = effect
   end
 end

@@ -346,8 +346,8 @@ def spawn_tanks args
 end
 
 def spawn_power_ups args
-  # Power-up spawns once every 10 seconds
-  if (args.state.tick_count % 600 == 0) || (args.keyboard.key_down.p && DEV_MODE)
+  # Power-up spawns once every 15 seconds
+  if (args.state.tick_count % 900 == 0) || (args.keyboard.key_down.p && DEV_MODE)
 
     # Determine a random power-up type
     # Health drops are the most common
@@ -441,7 +441,7 @@ def draw_explosion args, x, y, scale = 1
     tile_x: 0, tile_y: 0,
     tile_w: 8, tile_h: 8
   }
-  args.outputs.sounds << "assets/audio/sfx/power-up-hit.wav" # TODO explosion sfx?
+  args.outputs.sounds << "assets/audio/sfx/#{scale < 1 ? "explosion-quiet" : "explosion"}.wav"
 end
 
 def animate_explosions args
