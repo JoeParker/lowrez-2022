@@ -116,8 +116,8 @@ def destroy_tank_bullets args
   end
 end
 
-def damage_player args
-  args.state.player[:health] -= 1
+def damage_player args, amount = 1
+  args.state.player[:health] -= amount
   args.state.player[:last_hit_at] = args.state.tick_count
   args.outputs.sounds << "assets/audio/sfx/player-hit.wav"
 end
@@ -200,5 +200,27 @@ def move_bombers args
   args.state.bombers.reject! do |bomber|
     # Remove bombers that have fully left the screen
     bomber.x < -20 || bomber.x > 84
+  end
+end
+
+def move_bombs args
+  args.state.bombs.each do |bomb|
+    bomb.y -= 0.4
+  end
+end
+
+def destroy_bombs args 
+  args.state.bombs.reject! do |bomb|
+    # Check if bomb and player are within 5 pixels of each other (i.e. overlapping)
+    if 25 > (bomb.x - args.state.player.x) ** 2 + (bomb.y - args.state.player.y) ** 2
+      # Bomb is touching player. Destroy bomb, and reduce player HP by 2
+      unless player_is_invulnerable args 
+        damage_player args, 2
+        draw_explosion args, bomb.x, bomb.y
+      end
+    elsif bomb.y < 0
+      # Bomb has hit the ground, destroy it
+      draw_explosion args, bomb.x - 3, bomb.y - 3, 1.35
+    end
   end
 end

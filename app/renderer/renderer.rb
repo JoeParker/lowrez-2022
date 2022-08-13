@@ -79,6 +79,9 @@ def render_game args, lowrez_sprites
   args.state.bombers ||= []
   lowrez_sprites << [args.state.bombers]
 
+  args.state.bombs ||= []
+  lowrez_sprites << [args.state.bombs]
+
   args.state.power_ups ||= []
   lowrez_sprites << [args.state.power_ups]
 
@@ -363,8 +366,8 @@ def spawn_helos args
 end
 
 def spawn_bombers args
-  # Limit to max 1 bomber on screen at once
-  bomber_limit = 1
+  # Limit to max 1 bomer on screen at once, or 2 if over 400 points scored
+  bomber_limit = args.state.player.score >= 400 ? 2 : 1
   # And dont spawn bombers until score is at least 150
   return unless (args.state.bombers.length < bomber_limit && args.state.player[:score] >= 150) || (args.keyboard.key_down.b && DEV_MODE)
 
@@ -395,6 +398,7 @@ def animate_helos args
   # Animate 12 times per second
   return unless args.state.tick_count % 5 == 0
 
+  # We loop the animation rather than reversing, this actually looks more realistic for the rotor blade animation
   args.state.helos.each do |helo|
     if helo.tile_x < 24
       helo.tile_x += 8
@@ -471,7 +475,7 @@ def fire_helo args
 
     # Shoot once every 3 seconds, after moving fully onto the screen
     if args.state.tick_count % 180 == 0 && helo.x >= 0 && helo.x <= 59
-      # Add a new bullet to the list of tank bullets.
+      # Add a new bullet to the list of helo bullets.
       facing_left = helo.flip_horizontally
       args.state.helo_bullets << {
         x:     facing_left ? helo.x : helo.x + 8,
@@ -483,6 +487,26 @@ def fire_helo args
         angle: facing_left ? 90 : -90
       }
       args.outputs.sounds << "assets/audio/sfx/tank-fire.wav"
+    end
+  end
+end
+
+def fire_bomber args
+  args.state.bombers.each do |bomber|
+    bomber_midpoint = bomber.x + 8
+    # A bomber drops a single bomb when roughly above the player
+    if (bomber_midpoint - (args.state.player.x + 3)).abs < 5 && args.state.bombs.length < args.state.bombers.length
+      facing_right = bomber.flip_horizontally
+      # Add a new bomb to the list of bombs
+      args.state.bombs << {
+        x:     bomber_midpoint,
+        y:     bomber.y - 1,
+        w:     4, h: 2,
+        path:  'assets/sprites/bomb.png',
+        angle: facing_right ? 25 : -25,
+        flip_horizontally: facing_right
+      }
+      args.outputs.sounds << "assets/audio/sfx/bomb.wav"
     end
   end
 end
