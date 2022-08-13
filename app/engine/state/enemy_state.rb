@@ -216,11 +216,11 @@ def destroy_bombs args
       # Bomb is touching player. Destroy bomb, and reduce player HP by 2
       unless player_is_invulnerable args 
         damage_player args, 2
-        draw_explosion args, bomb.x, bomb.y
+        draw_explosion args, bomb.x - 3, bomb.y, 1.3
       end
     elsif bomb.y < 0
       # Bomb has hit the ground, destroy it
-      draw_explosion args, bomb.x - 3, bomb.y - 3, 1.35
+      draw_explosion args, bomb.x - 3, bomb.y - 3, 1.3
     end
   end
 end

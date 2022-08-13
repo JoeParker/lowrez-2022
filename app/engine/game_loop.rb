@@ -111,6 +111,8 @@ def reset_game player, args
   args.state.tanks.clear
   args.state.tank_bullets.clear
   args.state.power_ups.clear
+  args.state.active_orb.clear
+  args.state.active_bar.clear
   args.state.explosions.clear
   args.state.helos.clear
   args.state.helo_bullets.clear

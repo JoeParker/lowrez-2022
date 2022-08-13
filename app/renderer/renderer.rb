@@ -389,7 +389,8 @@ def spawn_bombers args
       tile_x: 0, tile_y: 0,
       tile_w: 17, tile_h: 6,
       tile_index: 0,
-      flip_horizontally: flip_horizontally
+      flip_horizontally: flip_horizontally,
+      has_ammo: true
     }
   end
 end
@@ -495,7 +496,7 @@ def fire_bomber args
   args.state.bombers.each do |bomber|
     bomber_midpoint = bomber.x + 8
     # A bomber drops a single bomb when roughly above the player
-    if (bomber_midpoint - (args.state.player.x + 3)).abs < 5 && args.state.bombs.length < args.state.bombers.length
+    if (bomber_midpoint - (args.state.player.x + 3)).abs < 5 && bomber.has_ammo
       facing_right = bomber.flip_horizontally
       # Add a new bomb to the list of bombs
       args.state.bombs << {
@@ -507,6 +508,7 @@ def fire_bomber args
         flip_horizontally: facing_right
       }
       args.outputs.sounds << "assets/audio/sfx/bomb.wav"
+      bomber.has_ammo = false
     end
   end
 end
