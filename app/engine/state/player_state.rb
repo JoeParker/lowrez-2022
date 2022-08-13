@@ -105,22 +105,41 @@ def grab_attack_player args
       tank.grab_state = :grabbed
     end 
   end
+  # 2. Helos
+  args.state.helos.each do |helo|
+    # Check if player and tank are within 4 pixels of each other (i.e. overlapping)
+    if 16 > (args.state.player.x - helo.x) ** 2 + (args.state.player.y - helo.y) ** 2
+      args.state.player.grabbing = true
+      helo.grab_state = :grabbed
+    end 
+  end
 end
 
 def drop_attack_player args
   return unless args.state.player.grabbing
 
-    # Find the currently grabbed enemy
-    args.state.tanks.each do |tank|
+  # Find the currently grabbed enemy
+  # 1. Tanks
+  args.state.tanks.each do |tank|
+    if args.keyboard.key_down.space || args.keyboard.key_held.space
+      # Set the tank to falling
+      tank.grab_state = :falling if tank.grab_state == :grabbed
+      args.state.player_dropped_vx = args.state.player[:vx]
       
-      if args.keyboard.key_down.space || args.keyboard.key_held.space
-        # Set the tank to falling
-        tank.grab_state = :falling if tank.grab_state == :grabbed
-        args.state.player_dropped_vx = args.state.player[:vx]
-        
-        # The player is now free to grab some more stuff
-        args.state.player.grabbing = false
-      end
+      # The player is now free to grab some more stuff
+      args.state.player.grabbing = false
+    end
+  end
+  # 2. Helos
+  args.state.helos.each do |helo|
+    if args.keyboard.key_down.space || args.keyboard.key_held.space
+      # Set the tank to falling
+      helo.grab_state = :falling if helo.grab_state == :grabbed
+      args.state.player_dropped_vx = args.state.player[:vx]
+      
+      # The player is now free to grab some more stuff
+      args.state.player.grabbing = false
+    end
   end
 end
 

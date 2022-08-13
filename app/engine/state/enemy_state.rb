@@ -124,6 +124,9 @@ end
 
 def move_helos args
   args.state.helos.each do |helo|
+    # Skip this helo if its grabbed, or falling
+    next unless helo.grab_state == nil
+
     # First, move the helo onto the screen
     helo.x += 0.1 if helo.x < 1
     helo.x -= 0.1 if helo.x > 55
@@ -142,7 +145,7 @@ end
 def move_helo_bullets args
   args.state.helo_bullets.each do |bullet|
     # Move the bullets according to the bullet's velocity
-    bullet.x += (bullet.angle < 0 ? 0.2 : -0.2) # Direction depends on helo direction
+    bullet.x += (bullet.angle < 0 ? 0.2 : -0.2) # Direction depends on helo direction, which we can determine by the sprite angle
   end
   args.state.helo_bullets.reject! do |bullet|
     # Despawn bullets that are outside the screen area
@@ -158,6 +161,32 @@ def destroy_helo_bullets args
       unless player_is_invulnerable args 
         damage_player args
         draw_explosion args, enemy.x, enemy.y
+      end
+    end
+  end
+end
+
+def carry_helos args
+  args.state.helos.each do |helo|
+    if helo.grab_state == :grabbed
+      helo.x = args.state.player.x
+      helo.y = args.state.player.y - 3
+      helo.angle = 25 if helo.flip_horizontally
+      helo.angle = -25 if !helo.flip_horizontally
+      helo.flip_horizontally = args.state.player.direction > 0
+    end
+  end
+end
+
+def drop_helos args
+  args.state.helos.each do |helo|
+    if helo.grab_state == :falling
+      helo.y -= 0.4
+      helo.x += args.state.player_dropped_vx
+      helo.angle -= 5
+      # Despawn helos at the ground
+      args.state.helos.reject! do |helo|
+        draw_explosion args, helo.x, helo.y - 3 if helo.y < 0
       end
     end
   end

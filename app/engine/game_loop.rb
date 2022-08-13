@@ -60,6 +60,8 @@ def game_loop args, lowrez_sprites, lowrez_labels, lowrez_mouse
     move_helo_bullets args
     animate_helo_bullets args
     destroy_helo_bullets args
+    carry_helos args
+    drop_helos args
 
     # Power ups
     spawn_power_ups args
