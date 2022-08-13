@@ -121,9 +121,9 @@ def drop_attack_player args
   # Find the currently grabbed enemy
   # 1. Tanks
   args.state.tanks.each do |tank|
-    if args.keyboard.key_down.space || args.keyboard.key_held.space
+    if (args.keyboard.key_down.space || args.keyboard.key_held.space) && tank.grab_state == :grabbed
       # Set the tank to falling
-      tank.grab_state = :falling if tank.grab_state == :grabbed
+      tank.grab_state = :falling
       args.state.player_dropped_vx = args.state.player[:vx]
       
       # The player is now free to grab some more stuff
@@ -132,9 +132,9 @@ def drop_attack_player args
   end
   # 2. Helos
   args.state.helos.each do |helo|
-    if args.keyboard.key_down.space || args.keyboard.key_held.space
+    if (args.keyboard.key_down.space || args.keyboard.key_held.space) && helo.grab_state == :grabbed
       # Set the tank to falling
-      helo.grab_state = :falling if helo.grab_state == :grabbed
+      helo.grab_state = :falling
       args.state.player_dropped_vx = args.state.player[:vx]
       
       # The player is now free to grab some more stuff

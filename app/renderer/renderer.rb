@@ -355,22 +355,24 @@ def spawn_tanks args
 end
 
 def spawn_helos args
-  # Limit to max 1 helo on screen at once, or 2 if over 100 points scored
-  helo_limit = args.state.player.score >= 100 ? 2 : 1
-  # And dont spawn helos until score is at least 20
-  return unless (args.state.helos.length < helo_limit && args.state.player[:score] >= 20) || (args.keyboard.key_down.h && DEV_MODE)
+  # Limit to max 1 helo on screen at once, or 2 if over 200 points scored
+  helo_limit = args.state.player.score >= 200 ? 2 : 1
+  # And dont spawn helos until score is at least 70
+  return unless (args.state.helos.length < helo_limit && args.state.player[:score] >= 70) || (args.keyboard.key_down.h && DEV_MODE)
 
   # Spawn enemies more frequently as the player's score increases.
   if rand < (75+args.state.player[:score])/(30000 + args.state.player[:score]) || (args.keyboard.key_down.h && DEV_MODE)
 
     # Spawn from left/right only
-    # TODO: only spawn one on each side
     case rand(2)
     when 0 # Spawn from left
       x, flip_horizontally = [-5, false]
     when 1 # Spawn from right
       x, flip_horizontally = [70, true]
     end
+    # If there's already a helo on that side, spawn across instead
+    x, flip_horizontally = [-5, false] if args.state.helos.any? { |helo| helo.x > 32 && helo.grab_state == nil }
+    x, flip_horizontally = [70, true] if args.state.helos.any? { |helo| helo.x < 32 && helo.grab_state == nil }
 
     args.state.helos << {
       x: x, y: rand(50) + 10,
