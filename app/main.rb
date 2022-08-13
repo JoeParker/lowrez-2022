@@ -5,7 +5,7 @@
 require 'app/engine/game_loop.rb'
 require 'app/renderer/lowrez_emulator.rb'
 
-DEV_MODE = true # Set to false before publish
+DEV_MODE = false # Set to false before publish
 
 def tick args
   sprites = []
