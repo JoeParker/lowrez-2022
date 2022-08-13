@@ -16,12 +16,22 @@ def move_power_ups args
 end
 
 def destroy_power_ups args 
+  args.state.power_ups.each do |power_up|
+    # If the power up hasn't been collected
+    if power_up.path != "assets/sprites/power-up-empty.png"
+      # Check if power-up and player are within 7 pixels of each other (i.e. overlapping)
+      if 49 > (power_up.x - args.state.player.x) ** 2 + (power_up.y - args.state.player.y) ** 2
+        # Power-up is touching player. Change its sprite, and activate its effect
+        power_up.path = "assets/sprites/power-up-empty.png"
+        args.outputs.sounds << "assets/audio/sfx/power-up.wav"
+        activate_power_up args, power_up.effect
+      end
+    end
+  end
   args.state.power_ups.reject! do |power_up|
-    # Check if power-up and player are within 7 pixels of each other (i.e. overlapping)
-    if 49 > (power_up.x - args.state.player.x) ** 2 + (power_up.y - args.state.player.y) ** 2
-      # Power-up is touching player. Remove it, and activate its effect
-      args.outputs.sounds << "assets/audio/sfx/power-up.wav"
-      activate_power_up args, power_up.effect
+    if power_up.y < -7
+      # Power-up is off screen, remove it.
+      true
     else
       args.state.player_bullets.any? do |bullet|
         # Check if power-up and bullet are within 4 pixels of each other (i.e. overlapping)
@@ -34,7 +44,7 @@ def destroy_power_ups args
   end
 end
 
-# TODO group the ones that active up for 5 secs under one case
+# TODO group the ones that are active for 5 secs under one case
 def activate_power_up args, effect
   case effect
   when :health
